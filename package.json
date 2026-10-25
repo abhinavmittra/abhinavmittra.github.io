@@ -3,6 +3,9 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "next": "^16.4.3",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "three": "0.186.1"
   },
   "version": "0.1.0",
@@ -10,7 +13,16 @@
     "node": ">=24"
   },
   "scripts": {
-    "dev": "node scripts/dev-server.mjs",
-    "check": "node --check dist/app.js && node --check dist/content.js && node --check scripts/dev-server.mjs"
+    "dev": "next dev --hostname 127.0.0.1 --port 4173",
+    "dev:legacy": "node scripts/dev-server.mjs",
+    "build": "next build",
+    "preview": "node scripts/dev-server.mjs out",
+    "check": "tsc --noEmit && node --check components/workspace/sceneRuntime.js && node --check public/legacy/app.js && node --check public/legacy/content.js && node --check public/legacy/bridge.js && node --check scripts/dev-server.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "^7.0.2"
   }
 }

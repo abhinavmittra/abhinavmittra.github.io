@@ -1,10 +1,10 @@
-import { profile, projects, stationCopy } from './content.js';
 import * as THREE from 'three';
-import { OrbitControls } from '/vendor/OrbitControls.js';
-import { SVGRenderer } from '/vendor/SVGRenderer.js';
+import { OrbitControls } from '/legacy/vendor/OrbitControls.js';
+import { SVGRenderer } from '/legacy/vendor/SVGRenderer.js';
 
-const $ = s => document.querySelector(s);
-const $$ = s => [...document.querySelectorAll(s)];
+export function initializeWorkspace(root, { profile, projects, stationCopy }) {
+const $ = s => root.querySelector(s);
+const $$ = s => [...root.querySelectorAll(s)];
 const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
 const defaults = {theme:'studio',accent:'#b6c7a3',light:100,speed:100,separation:0,gentle:matchMedia('(prefers-reduced-motion: reduce)').matches};
 let saved={};try{saved=JSON.parse(localStorage.getItem('abhi-desk-look')||'{}');}catch{}
@@ -16,6 +16,11 @@ let flowOn=true,orbitOn=false,paused=false,selected=null,hovered=null,tourIndex=
 let renderer,scene,camera,controls,world,keyLight,ambient,softAmbient,grid,ground,base,accentMat,accentSoft,glowMat,software=false;
 const stations={},flows=[],floaters=[],rings=[],layers=[],animated=[];
 const host=$('#scene');
+let frameRequest=0,resizeObserver;
+const previousTheme=document.body.dataset.theme;
+const previousClasses=new Map(['gentle','focused','software-mode'].map(name=>[name,document.body.classList.contains(name)]));
+const customProperties=['--bg','--panel','--text','--muted','--accent','--line'];
+const previousCustomProperties=new Map(customProperties.map(name=>[name,document.documentElement.style.getPropertyValue(name)]));
 const themes={studio:{bg:'#141a17',panel:'#1a211d',text:'#f0eee5',muted:'#9ba79d',base:'#26312b',floor:'#141a17',key:0xffe4c3},dusk:{bg:'#111923',panel:'#182330',text:'#e9f0f1',muted:'#94a8b9',base:'#24333e',floor:'#111923',key:0xc9ddff},daylight:{bg:'#e9e8dd',panel:'#f3f1e8',text:'#24332b',muted:'#65756b',base:'#c5c9b9',floor:'#e9e8dd',key:0xffefd6}};
 
 const positions={discovery:new THREE.Vector3(-2.6,0,-1.35),incident:new THREE.Vector3(1.25,0,1.7),integrations:new THREE.Vector3(3.2,0,-1.65),fieldnotes:new THREE.Vector3(-3.45,0,2.35)};
@@ -56,7 +61,7 @@ function makeStation(key,w,d){const g=new THREE.Group();g.position.copy(position
 function createScene(){
   scene=new THREE.Scene();scene.background=new THREE.Color(themes[settings.theme].bg);scene.fog=new THREE.Fog(themes[settings.theme].bg,35,75);
   const probe=document.createElement('canvas');let hasGL=false;try{hasGL=!!probe.getContext('webgl2');}catch{}
-  if(hasGL){renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.65));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;renderer.outputColorSpace=THREE.SRGBColorSpace;}
+  if(hasGL){renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.65));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;renderer.outputColorSpace=THREE.SRGBColorSpace;}
   else{software=true;renderer=new SVGRenderer();renderer.setQuality('high');renderer.setPrecision(2);renderer.domElement.classList.add('software-scene');document.body.classList.add('software-mode');$('.live-label').textContent='LIVE 3D / COMPATIBILITY';}
   renderer.domElement.setAttribute('aria-label','3D model of Abhinav’s engineering workbench. Drag to rotate, scroll to zoom.');renderer.domElement.tabIndex=0;host.prepend(renderer.domElement);
   camera=new THREE.OrthographicCamera(-8,8,6,-6,.1,150);camera.position.set(12,11,14);
@@ -104,8 +109,8 @@ function createScene(){
   const tracks=[{key:'discovery',p:[[-2.3,-.09,-2.7],[-2.3,-.09,-3.25],[3.2,-.09,-3.25],[3.2,-.09,-2.8]]},{key:'incident',p:[[-.8,-.09,-1.1],[-.25,-.09,-1.1],[-.25,-.09,.4],[1.25,-.09,.4]]},{key:'integrations',p:[[3.8,-.09,-.4],[4.75,-.09,-.4],[4.75,-.09,1.7],[2.8,-.09,1.7]]},{key:'fieldnotes',p:[[-2.5,-.09,2.3],[-1.7,-.09,2.3],[-1.7,-.09,3.15],[.6,-.09,3.15],[.6,-.09,2.8]]}];
   for(const t of tracks){const curve=new THREE.CatmullRomCurve3(t.p.map(p=>new THREE.Vector3(...p)),false,'centripetal');mesh(new THREE.TubeGeometry(curve,100,.014,6,false),accentMat,world);for(let i=0;i<3;i++){const b=mesh(new THREE.SphereGeometry(.035,8,6),glowMat,world);flows.push({mesh:b,curve,phase:i/3,speed:.055,station:t.key});}for(const p of [t.p[0],t.p.at(-1)])cylinder(.055,.015,accentMat,world,p[0],p[1],p[2]);}
   if(software){ground.visible=false;grid.visible=false;dots.visible=false;world.traverse(o=>{if(o.isMesh){o.material.flatShading=true;if(o.material.transparent&&o.material.opacity<.6)o.visible=false;}});}
-  const resize=()=>{const w=host.clientWidth,h=host.clientHeight,aspect=w/h;const span=Math.max(11.8,16.8/aspect);camera.left=-span*aspect/2;camera.right=span*aspect/2;camera.top=span/2;camera.bottom=-span/2;camera.updateProjectionMatrix();renderer.setSize(w,h);};new ResizeObserver(resize).observe(host);resize();
-  bindCanvas();controls.update();applyLook();renderer.render(scene,camera);$('#loading').classList.add('done');requestAnimationFrame(frame);
+  const resize=()=>{const w=host.clientWidth,h=host.clientHeight,aspect=w/h;const span=Math.max(11.8,16.8/aspect);camera.left=-span*aspect/2;camera.right=span*aspect/2;camera.top=span/2;camera.bottom=-span/2;camera.updateProjectionMatrix();renderer.setSize(w,h);};resizeObserver=new ResizeObserver(resize);resizeObserver.observe(host);resize();
+  bindCanvas();controls.update();applyLook();renderer.render(scene,camera);$('#loading').classList.add('done');frameRequest=requestAnimationFrame(frame);
 }
 
 let cameraMove=null,arrivalStart=performance.now(),last=performance.now(),clock=0,currentSeparation=0;
@@ -123,7 +128,7 @@ function frame(now){const dt=clamp((now-last)/1000,0,.05);last=now;const moving=
   controls.autoRotate=orbitOn&&moving&&!cameraMove;controls.update();renderer.render(scene,camera);
   const w=host.clientWidth,h=host.clientHeight;
   for(const b of $$('.hotspot')){const key=b.dataset.station,g=stations[key],v=new THREE.Vector3(...labelAnchors[key]);g.localToWorld(v);v.project(camera);const x=(v.x+1)*w/2,y=(-v.y+1)*h/2;const half=b.offsetWidth/2;b.style.transform=`translate(${clamp(x,half+4,w-half-4)-half}px,${clamp(y,35,h-95)}px)`;b.style.visibility=v.z>1?'hidden':'visible';}
-  requestAnimationFrame(frame);
+  frameRequest=requestAnimationFrame(frame);
 }
 function bindCanvas(){const ray=new THREE.Raycaster(),pointer=new THREE.Vector2();let down=null,lastHover=0;const hit=e=>{const r=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,camera);const hits=ray.intersectObjects(Object.values(stations),true);for(const h of hits){let o=h.object;while(o){if(o.userData.station)return o.userData.station;o=o.parent;}}return null;};
   renderer.domElement.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY];});
@@ -170,7 +175,38 @@ $('#save-look').onclick=()=>{try{localStorage.setItem('abhi-desk-look',JSON.stri
 $('#export-look').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({name:'Abhinav Systems Desk',...settings},null,2)],{type:'application/json'}));a.download='abhinav-desk-settings.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('Settings exported.');};
 $('#reset-look').onclick=()=>{Object.assign(settings,defaults);applyLook();overview();toast('Default look restored. Save it to replace your saved look.');};
 $('#command-form').onsubmit=e=>{e.preventDefault();const v=$('#command').value.trim().toLowerCase();$('#command').value='';const first=v.split(/\s+/)[0];if(['tour','explore'].includes(first))tourStep(0);else if(['home','reset','overview','work'].includes(first)){stopTour();panel('detail-panel',false);overview();}else if(['discovery','finance'].includes(first))openStation('discovery');else if(['incident','agent'].includes(first))openStation('incident');else if(['integration','integrations','apis'].includes(first))openStation('integrations');else if(['about','coffee','fieldnotes','field'].includes(first))openStation('fieldnotes');else if(['journey','experience'].includes(first))openJourney();else if(first==='contact')openContact();else if(['customize','settings'].includes(first))$('#customize').click();else if(['explode','layers'].includes(first))$('#explode-toggle').click();else if(first==='orbit')$('#orbit-toggle').click();else if(first==='flow')$('#flow-toggle').click();else if(first==='help')toast('Commands: tour · discovery · incident · integrations · about · journey · contact · customize · explode · orbit · reset');else toast('Try discovery, incident, integrations, tour, or help.');};
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){stopTour();panel('custom-panel',false);panel('detail-panel',false);overview();$('#customize').focus();}if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('#command').focus();}});
+const handleKeydown=e=>{if(e.key==='Escape'){stopTour();panel('custom-panel',false);panel('detail-panel',false);overview();$('#customize').focus();}if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('#command').focus();}};
+root.addEventListener('keydown',handleKeydown);
 applyContent();
 applyLook();
 try{createScene();}catch(error){console.error('3D initialization:',error);$('#loading').hidden=true;$('#fallback').hidden=false;$('#labels').hidden=true;$('#scene-name').textContent='WORKSPACE / PROJECT INDEX';toast('3D is unavailable here. Every project remains accessible in the project index.');}
+return function cleanupWorkspace(){
+  cancelAnimationFrame(frameRequest);
+  resizeObserver?.disconnect();
+  root.removeEventListener('keydown',handleKeydown);
+  clearInterval(workflowTimer);
+  clearTimeout(toastTimer);
+  controls?.dispose();
+  const geometries=new Set(),materials=new Set(),textures=new Set();
+  scene?.traverse(object=>{
+    if(object.geometry)geometries.add(object.geometry);
+    const objectMaterials=Array.isArray(object.material)?object.material:object.material?[object.material]:[];
+    for(const current of objectMaterials){
+      materials.add(current);
+      for(const value of Object.values(current))if(value?.isTexture)textures.add(value);
+    }
+  });
+  textures.forEach(texture=>texture.dispose());
+  materials.forEach(current=>current.dispose());
+  geometries.forEach(geometry=>geometry.dispose());
+  renderer?.dispose?.();
+  renderer?.domElement.remove();
+  for(const [name,present] of previousClasses)document.body.classList.toggle(name,present);
+  if(previousTheme===undefined)delete document.body.dataset.theme;
+  else document.body.dataset.theme=previousTheme;
+  for(const [name,value] of previousCustomProperties){
+    if(value)document.documentElement.style.setProperty(name,value);
+    else document.documentElement.style.removeProperty(name);
+  }
+};
+}
