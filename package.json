@@ -1,0 +1,16 @@
+{
+  "name": "abhinav-systems-desk-3d",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "three": "0.186.1"
+  },
+  "version": "0.1.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "node scripts/dev-server.mjs",
+    "check": "node --check dist/app.js && node --check dist/content.js && node --check scripts/dev-server.mjs"
+  }
+}
