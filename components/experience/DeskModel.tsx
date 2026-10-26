@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, type RefObject } from "react";
+import { useEffect, useLayoutEffect, useRef, type RefObject } from "react";
 import { useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 import { createRestoredDesk } from "@/components/three/restoredDesk";
@@ -14,12 +14,14 @@ type Props = Pick<
 > & {
   active: boolean;
   showClock: boolean;
+  showLabels: boolean;
   highlight: string | null;
   onHover: (id: string | null) => void;
   onCoffee: () => void;
   onLamp: () => void;
   onClock: () => void;
-  labels: RefObject<Record<string, HTMLButtonElement | null>>;
+  onTravel: () => void;
+  labels: RefObject<Record<string, HTMLElement | null>>;
   host: RefObject<HTMLDivElement | null>;
   clock: RefObject<HTMLButtonElement | null>;
 };
@@ -33,7 +35,8 @@ export function DeskModel(props: Props) {
   const { invalidate, gl, camera } = useThree();
   const options = useRef(props);
   options.current = props;
-  useEffect(() => {
+  // Camera flights measure station bounds in a passive effect after this model is attached.
+  useLayoutEffect(() => {
     const desk = createRestoredDesk(invalidate);
     runtime.current = desk;
     root.current?.add(desk.world);
@@ -43,7 +46,7 @@ export function DeskModel(props: Props) {
     desk.highlight(options.current.highlight);
     const buttons = Object.values(props.labels.current).filter(
       Boolean,
-    ) as HTMLButtonElement[];
+    ) as HTMLElement[];
     if (props.host.current && buttons.length)
       annotations.current = createStationLabels(
         props.host.current,
@@ -129,7 +132,7 @@ export function DeskModel(props: Props) {
     );
     const obstacles = banner.current?.update(camera, props.showClock) || [];
     if (lampAnimating) invalidate();
-    annotations.current?.update(camera, delta, {
+    if (props.showLabels) annotations.current?.update(camera, delta, {
       separation: props.look.separation / 100,
       hovered: props.highlight,
       snap: !props.motion,
@@ -153,6 +156,7 @@ export function DeskModel(props: Props) {
     if (id === "lamp") props.onLamp();
     else if (id === "clock") props.onClock();
     else if (id === "coldbrew") props.onCoffee();
+    else if (id === "travel") props.onTravel();
     else props.onOpen(id as ProjectKey);
   }
   return (

@@ -6,6 +6,7 @@ import * as THREE from "three";
 import { deskPositions } from "@/components/three/restoredDesk";
 import type { SceneProps } from "./types";
 import type { CameraAngle } from "./preferences";
+import type { StationKey } from "@/content/portfolio";
 
 type Flight = {
   elapsed: number;
@@ -25,6 +26,12 @@ export type CameraPose = {
   coffee: boolean;
 };
 const clamp = THREE.MathUtils.clamp;
+const stationViews: Record<StationKey, [number, number, number]> = {
+  discovery: [6, 10, 12],
+  incident: [3.5, 3.8, 12],
+  integrations: [5, 7, 12],
+  fieldnotes: [5, 6, 12],
+};
 /** Orbit owns the camera between explicit flights. No scroll handler can pull it back each frame. */
 export function DeskCamera({
   command,
@@ -34,27 +41,32 @@ export function DeskCamera({
   pose,
   angle,
   speed,
+  compact,
+  touring,
 }: Pick<SceneProps, "command" | "motion" | "orbit" | "onChapter"> & {
   pose: RefObject<CameraPose | null>;
   angle: CameraAngle;
   speed: number;
+  compact: boolean;
+  touring: boolean;
 }) {
-  const { camera: rawCamera, gl, size, invalidate } = useThree();
+  const { camera: rawCamera, gl, size, scene, invalidate } = useThree();
   const camera = rawCamera as THREE.OrthographicCamera;
   const controls = useRef<OrbitControls | null>(null),
     flight = useRef<Flight | null>(null),
     zoom = useRef(1),
     lastCommand = useRef(-1),
+    lastLayout = useRef(''),
     report = useRef({ time: 0, frames: 0 });
-  const saved = useRef({ motion, orbit, onChapter, command, speed });
-  saved.current = { motion, orbit, onChapter, command, speed };
+  const saved = useRef({ motion, orbit, onChapter, command, speed, compact });
+  saved.current = { motion, orbit, onChapter, command, speed, compact };
   const manual = useRef(false),
     applying = useRef(false),
     portal = useRef(false);
   useEffect(() => {
     const control = new OrbitControls(camera, gl.domElement);
     controls.current = control;
-    control.target.set(0, 0.35, 0);
+    control.target.set(-.4, 0.35, 0);
     control.enableDamping = true;
     control.dampingFactor = 0.09;
     control.rotateSpeed = 0.55;
@@ -63,7 +75,7 @@ export function DeskCamera({
     control.minPolarAngle = 0.12;
     control.maxPolarAngle = Math.PI * 0.48;
     control.minZoom = 0.65;
-    control.maxZoom = 2.8;
+    control.maxZoom = 4.5;
     control.autoRotateSpeed = 0.6;
     if (pose.current) {
       camera.position.fromArray(pose.current.position);
@@ -106,7 +118,7 @@ export function DeskCamera({
         -120,
         120,
       );
-      zoom.current = clamp(zoom.current * Math.exp(-delta * 0.0018), 0.65, 2.8);
+      zoom.current = clamp(zoom.current * Math.exp(-delta * 0.0018), control.minZoom, control.maxZoom);
       invalidate();
     };
     const key = (event: KeyboardEvent) => {
@@ -115,7 +127,7 @@ export function DeskCamera({
         zoom.current = clamp(
           zoom.current * (event.key === "-" || event.key === "_" ? 0.85 : 1.18),
           0.65,
-          2.8,
+          control.maxZoom,
         );
         flight.current = null;
         invalidate();
@@ -154,11 +166,11 @@ export function DeskCamera({
       control.dispose();
       controls.current = null;
     };
-  }, [camera, gl, invalidate]);
+  }, [camera, gl, invalidate, compact]);
   useEffect(() => {
     // Fit the original room fragment at any aspect ratio without changing the user's orbit or zoom.
     const aspect = size.width / Math.max(1, size.height),
-      span = Math.max(11.8, 18.6 / aspect);
+      span = Math.max(11.8, 19.6 / aspect);
     camera.left = (-span * aspect) / 2;
     camera.right = (span * aspect) / 2;
     camera.top = span / 2;
@@ -168,28 +180,31 @@ export function DeskCamera({
   }, [size.width, size.height, camera, invalidate]);
   useEffect(() => {
     const control = controls.current;
-    if (!control || lastCommand.current === command.id) return;
+    const layout = `${size.width}:${size.height}:${compact}`;
+    const reframe = lastLayout.current !== layout && (touring || command.target === 'coffee');
+    lastLayout.current = layout;
+    if (!control || (lastCommand.current === command.id && !reframe)) return;
     lastCommand.current = command.id;
     if (command.target === "zoom-in" || command.target === "zoom-out") {
       flight.current = null;
       zoom.current = clamp(
         zoom.current * (command.target === "zoom-in" ? 1.18 : 1 / 1.18),
         0.65,
-        2.8,
+        control.maxZoom,
       );
       invalidate();
       return;
     }
     const coffee = command.target === "coffee",
       clock = command.target === "clock";
-    const target = new THREE.Vector3(0, 0.35, 0);
+    const target = new THREE.Vector3(-.4, 0.35, 0);
     let targetZoom = 1;
     if (command.target !== "overview") {
       const p = deskPositions[command.target];
       target.set(p[0], p[1] + 0.9, p[2]);
-      targetZoom = coffee ? 2.5 : clock ? 2.3 : 1.4;
+      targetZoom = coffee ? (compact ? 4.1 : 2.5) : clock ? (compact ? 3 : 2.3) : 1;
       // Leave the bottle on the left of the desktop catalogue overlay.
-      if (coffee && size.width >= 600) target.x += 1.9;
+      if (coffee && !compact) target.x += 1.9;
     }
     const offset = coffee
       ? new THREE.Vector3(4, 3, 13)
@@ -200,6 +215,39 @@ export function DeskCamera({
           : angle === "low"
             ? new THREE.Vector3(12, 5, 16)
             : new THREE.Vector3(12, 11, 14);
+    const station = command.target as StationKey;
+    if (stationViews[station]) {
+      offset.fromArray(stationViews[station]);
+      const subject = scene.getObjectByName(`Desk station: ${station}`);
+      subject?.updateWorldMatrix(true, true);
+      const bounds = subject
+        ? new THREE.Box3().setFromObject(subject)
+        : new THREE.Box3().setFromCenterAndSize(target, new THREE.Vector3(3.8, 2.6, 2.8));
+      bounds.getCenter(target);
+      const direction = offset.clone().normalize();
+      const right = new THREE.Vector3().crossVectors(camera.up, direction).normalize();
+      const up = new THREE.Vector3().crossVectors(direction, right).normalize();
+      const corner = new THREE.Vector3();
+      let left = Infinity, rightEdge = -Infinity, bottom = Infinity, top = -Infinity;
+      for (let i = 0; i < 8; i++) {
+        corner.set(i & 1 ? bounds.max.x : bounds.min.x, i & 2 ? bounds.max.y : bounds.min.y, i & 4 ? bounds.max.z : bounds.min.z).sub(target);
+        const x = corner.dot(right), y = corner.dot(up);
+        left = Math.min(left, x); rightEdge = Math.max(rightEdge, x);
+        bottom = Math.min(bottom, y); top = Math.max(top, y);
+      }
+      // One layout read per flight reserves the tour panel; nothing is measured in the frame loop.
+      const panel = touring && !compact
+        ? gl.domElement.closest('.scene-stage')?.querySelector('.experience-tour')
+        : null;
+      const panelHeight = panel?.getBoundingClientRect().height ?? 0;
+      const regionTop = 22;
+      const regionBottom = Math.max(size.height * .4, size.height - (panelHeight ? panelHeight + 64 : 22));
+      const regionHeight = regionBottom - regionTop;
+      const frameWidth = camera.right - camera.left, frameHeight = camera.top - camera.bottom;
+      targetZoom = clamp(Math.min(frameWidth * .84 / Math.max(.1, rightEdge - left), frameHeight * (regionHeight / size.height) * .88 / Math.max(.1, top - bottom)), control.minZoom, control.maxZoom);
+      const centreY = (regionTop + regionBottom) / 2;
+      target.addScaledVector(up, (centreY / size.height - .5) * frameHeight / targetZoom);
+    }
     // Discard residual orbit damping once before taking ownership for an explicit transition.
     control.enableDamping = false;
     control.update();
@@ -219,7 +267,7 @@ export function DeskCamera({
       saved.current.onChapter(false);
     }
     invalidate();
-  }, [command, camera, invalidate, size.width, angle]);
+  }, [command, camera, gl, scene, invalidate, compact, angle, touring, size.width, size.height]);
   useFrame((_, delta) => {
     const control = controls.current;
     if (!control) return;
@@ -230,7 +278,7 @@ export function DeskCamera({
       control.autoRotate = false;
       control.enableDamping = false;
       current.elapsed += dt;
-      const t = saved.current.motion ? Math.min(1, current.elapsed / 0.95) : 1;
+      const t = saved.current.motion ? Math.min(1, current.elapsed / (saved.current.compact ? .75 : .95)) : 1;
       const eased = t * t * t * (t * (t * 6 - 15) + 10); // Quintic ease: zero acceleration at both ends.
       camera.position.lerpVectors(current.from, current.to, eased);
       control.target.lerpVectors(current.fromTarget, current.target, eased);
@@ -264,13 +312,11 @@ export function DeskCamera({
     const stats = report.current;
     stats.time += delta;
     stats.frames++;
-    gl.domElement.dataset.dpr = gl.getPixelRatio().toFixed(2);
-    gl.domElement.dataset.antialias = String(
-      gl.getContext().getContextAttributes()?.antialias,
-    );
-    gl.domElement.dataset.zoom = camera.zoom.toFixed(3);
-    gl.domElement.dataset.azimuth = control.getAzimuthalAngle().toFixed(3);
     if (stats.time >= 1) {
+      gl.domElement.dataset.dpr = gl.getPixelRatio().toFixed(2);
+      gl.domElement.dataset.antialias = String(gl.getContext().getContextAttributes()?.antialias);
+      gl.domElement.dataset.zoom = camera.zoom.toFixed(3);
+      gl.domElement.dataset.azimuth = control.getAzimuthalAngle().toFixed(3);
       gl.domElement.dataset.drawCalls = String(gl.info.render.calls);
       gl.domElement.dataset.triangles = String(gl.info.render.triangles);
       gl.domElement.dataset.fps = String(Math.round(stats.frames / stats.time));

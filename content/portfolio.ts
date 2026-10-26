@@ -86,18 +86,25 @@ export const stationCopy: Record<StationKey, StationCopy> = {
   fieldnotes: { label: 'Beyond the screen', nav: 'Field notes', eyebrow: '', compactLabel: 'Field notes', invitation: 'Travel, maps & coffee' }
 };
 
+export const travelStationCopy = {
+  label: 'The travel atlas',
+  compactLabel: `${travel.count} countries`,
+  invitation: 'See where I’ve been',
+  href: travel.href,
+};
+
 export const projects: Record<ProjectKey, Project> = {
   discovery: {
     title: 'Engineering at Cisco', short: 'Cisco', status: '2020 to today · Software Engineer 3',
     tags: ['Angular', 'Node.js', 'MuleSoft', 'OpenShift', 'LangGraph'],
     description: 'Six years of learning where software meets the next system. Application work, enterprise integrations, and two ongoing agent projects now share one corner of the desk.',
-    contribution: 'I contribute to four Angular and Node.js applications, cross-team APIs, and data synchronization. My current AI work explores finance discovery with human review and an incident resolver with a separate feedback agent.',
+    contribution: 'I contribute to multiple full stack applications,cross team APIs, and data synchronization. My current AI work explores agentic engineering for cisco it solutions and incident resolvers with feedback agents.',
     highlights: [{value:'4',label:'enterprise applications'},{value:'2',label:'ongoing agent projects'}],
     story: [
       {heading:'The handoff is the work',body:'I started with Spring MVC services and a monitoring dashboard in 2020. MuleSoft, booking and reseller APIs came next. Working across those boundaries taught me to look past a single screen: what gets handed over, what can fail, and who needs enough context to continue?'},
       {heading:'From services to agents',body:'The finance workbench carries a requirement through analysis, review, and a solution document. The incident project separates resolution from feedback. Both are ongoing. The same engineering question follows me into each: can the next step trust what the previous one left behind?'}
     ],
-    notes: ['Four Angular applications with Node.js backends.', 'MuleSoft, REST APIs, Snowflake synchronization, and OpenShift.', 'Container security with Chainguard images.'],
+    notes: ['Multiple MEAN/MERN stack applications.', 'MuleSoft, Python, REST APIs, Databases synchronization, and OpenShift.', 'Container security with Chainguard images.'],
     relatedProjects: ['finance','resolver','enterprise'],
     links: [{label:'Resume',href:'/resume.pdf'}]
   },
@@ -349,8 +356,8 @@ export const projects: Record<ProjectKey, Project> = {
     title: 'Beyond the screen',
     short: 'Field notes',
     status: 'Away from the keyboard',
-    tags: ['Backpacking', 'Coffee', 'Backpacking Abi'],
-    description: 'I’m Abhinav, a software engineer in Jaipur. I’ve visited 29 countries over the last four years. Backpacking, coffee, and the things I make away from work have a place on this desk too.',
+    tags: ['Backpacking', 'Brew Coffee', 'Hiking'],
+    description: 'I’m Abhinav, a software engineer who works in Bangalore. I’ve visited 29 countries over the last four years. Backpacking, coffee, and the things I make away from work have a place on this desk too.',
     contribution: 'Travel gives me something different to pay attention to: a route, a neighbourhood, or a place to stop for coffee. I document journeys as Backpacking Abi. At home in Jaipur, that interest became A•WAKE, the cold brew I make and share.',
     links: [{label:'Explore my 29-country travel map',href:travel.href}],
     highlights: [{value:String(travel.count),label:'countries visited',href:travel.href},{value:'4',label:'years of travel'}],

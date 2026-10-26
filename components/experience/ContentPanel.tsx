@@ -20,6 +20,7 @@ import { mailDraft } from "./performance";
 import { sitePath } from "@/lib/sitePath";
 import type { Panel } from "./types";
 import { AppearancePanel, type AppearanceProps } from "./AppearancePanel";
+import { AwakeLogo } from "@/components/cold-brew/AwakeLogo";
 
 function StoryText({ text }: { text: string }) {
   const parts = text.split("Backpacking Abi");
@@ -251,7 +252,10 @@ function ProjectDetail({
                 key={key}
                 onClick={() => onOpen(key)}
               >
-                {projects[key].title}
+                <span className="related-project-label">
+                  {key === 'coldbrew' && <span className="related-awake-logo" aria-hidden="true"><AwakeLogo compact /></span>}
+                  <span>{projects[key].title}</span>
+                </span>
                 <span aria-hidden="true">↗</span>
               </button>
             ))}

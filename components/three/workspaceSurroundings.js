@@ -14,12 +14,12 @@ export function createWorkspaceSurroundings({
     p = deskPalette;
   const frame = material(p.graphite, { roughness: 0.85, metalness: 0.1 });
   const floor = rounded(
-    15.2,
+    16.8,
     11.8,
     0.12,
     material("#272d2b", { roughness: 1, metalness: 0 }),
     world,
-    0,
+    -.6,
     -1.65,
     0,
     0.6,

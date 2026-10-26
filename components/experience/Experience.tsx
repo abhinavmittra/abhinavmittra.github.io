@@ -11,6 +11,7 @@ import {
   profile,
   projects,
   stationCopy,
+  travelStationCopy,
   interfaceCopy,
   type ProjectKey,
   type StationKey,
@@ -23,6 +24,7 @@ import type { Panel, Quality, SceneCommand } from "./types";
 import "./experience.css";
 import { accentText, defaultLook, type DeskLook } from "./preferences";
 import { sitePath } from "@/lib/sitePath";
+import { deskStationColors } from "@/content/appearance";
 const AdaptiveScene = dynamic(() => import("./AdaptiveScene"), {
   ssr: false,
   loading: () => (
@@ -47,7 +49,8 @@ export function Experience() {
     setLook,
   } = usePreferences();
   const [panel, setPanel] = useState<Panel>(null),
-    [quality, setQuality] = useState<Quality>("balanced");
+    [quality, setQuality] = useState<Quality>("balanced"),
+    [compact, setCompact] = useState(false);
   const [flow, setFlow] = useState(true),
     [orbit, setOrbit] = useState(false),
     [lamp, setLamp] = useState(false);
@@ -65,10 +68,34 @@ export function Experience() {
     return () => clearTimeout(timer);
   }, [announcement]);
   const coffeeRef = useRef<HTMLDivElement>(null),
-    inputRef = useRef<HTMLInputElement>(null);
+    inputRef = useRef<HTMLInputElement>(null),
+    sceneRef = useRef<HTMLElement>(null);
   useEffect(() => {
-    setQuality(innerWidth < 800 ? "balanced" : "high");
+    const media = matchMedia('(max-width: 800px)');
+    setCompact(media.matches);
+    setQuality(media.matches ? "balanced" : "high");
+    const resize = () => {
+      setCompact(media.matches);
+      if (media.matches)
+        setQuality(current => current === 'high' ? 'balanced' : current);
+    };
+    media.addEventListener('change', resize);
+    return () => media.removeEventListener('change', resize);
   }, []);
+  useEffect(() => {
+    if (!compact || (tour < 0 && !coffee)) return;
+    // Measure after React commits the panel so document height includes its full contents.
+    const frame = requestAnimationFrame(() => {
+      const stage = sceneRef.current;
+      if (!stage) return;
+      const available = (window.visualViewport?.height ?? innerHeight) - 24;
+      const panel = stage.querySelector<HTMLElement>('.experience-tour, .coffee-landing');
+      if (panel && stage.offsetHeight > available)
+        panel.scrollIntoView({ behavior: 'instant', block: 'end' });
+      else stage.scrollIntoView({ behavior: 'instant', block: 'start' });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [compact, tour, coffee]);
   useEffect(() => {
     const shortcut = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
@@ -131,6 +158,7 @@ export function Experience() {
   }
   function coffeeBreak() {
     setTour(-1);
+    setOrbit(false);
     setPanel(null);
     if (minimal) {
       setCoffee(true);
@@ -140,7 +168,13 @@ export function Experience() {
           block: "start",
         }),
       );
-    } else navigate("coffee");
+    } else {
+      scrollToScene();
+      navigate("coffee");
+    }
+  }
+  function scrollToScene() {
+    if (compact) requestAnimationFrame(() => sceneRef.current?.scrollIntoView({ behavior: 'instant', block: 'start' }));
   }
   function toggleView() {
     setMinimal(!minimal);
@@ -159,6 +193,9 @@ export function Experience() {
       navigate("overview");
       return;
     }
+    setCoffee(false);
+    setPanel(null);
+    setOrbit(false);
     setTour(index);
     navigate(keys[index]);
   }
@@ -316,7 +353,9 @@ export function Experience() {
             </button>
           </div>
           {!minimal && (
-            <div className="motion-controls">
+            <details className="desk-controls" open={!compact}>
+              <summary>Desk controls</summary>
+              <div className="motion-controls">
               <button
                 style={{ "--item-color": "#efd594" } as React.CSSProperties}
                 aria-pressed={flow}
@@ -376,7 +415,8 @@ export function Experience() {
               >
                 Desk light
               </button>
-            </div>
+              </div>
+            </details>
           )}
           <div className="profile-footer">
             <button className="text-link" onClick={() => open("settings")}>
@@ -411,11 +451,14 @@ export function Experience() {
             </>
           ) : (
             <section
-              className={`scene-stage ${coffee ? "is-coffee" : ""}`}
+              ref={sceneRef}
+              className={`scene-stage ${coffee ? "is-coffee" : ""} ${tour >= 0 ? 'is-touring' : ''}`}
               aria-label="Interactive Systems Desk"
             >
               {ready && (
                 <AdaptiveScene
+                  compact={compact}
+                  focusedStation={tour >= 0 ? keys[tour] : null}
                   motion={effectiveMotion}
                   look={look}
                   arrival={arrival}
@@ -427,7 +470,12 @@ export function Experience() {
                   atmosphere={atmosphere}
                   command={command}
                   onQuality={setQuality}
-                  onOpen={openProject}
+                  onOpen={(key) => {
+                    const index = keys.indexOf(key as StationKey);
+                    if (compact && index >= 0) tourStep(index);
+                    else openProject(key);
+                  }}
+                  onTravel={() => window.location.assign(sitePath(travelStationCopy.href))}
                   onChapter={chapter}
                   onUnavailable={unavailable}
                   onNavigate={(target) => {
@@ -459,10 +507,37 @@ export function Experience() {
                     <CoffeeLanding />
                   </div>
                 </>
-              ) : (
+              ) : tour < 0 ? (
                 <div className="scene-caption">
-                  <span>Pick a story on the desk.</span>
+                  <span>{compact ? 'Tap a model or choose a story.' : 'Pick a story on the desk.'}</span>
                 </div>
+              ) : null}
+              {compact && !coffee && (
+                <nav className="mobile-station-nav" aria-label="Explore the desk">
+                  {keys.map((key, index) => (
+                    <button
+                      key={key}
+                      onClick={() => tourStep(index)}
+                      aria-pressed={tour === index}
+                      style={{ '--item-color': deskStationColors[key] } as React.CSSProperties}
+                    >
+                      {stationCopy[key].compactLabel}
+                    </button>
+                  ))}
+                  <button
+                    onClick={coffeeBreak}
+                    style={{ '--item-color': deskStationColors.coldbrew } as React.CSSProperties}
+                  >
+                    A•WAKE coffee
+                  </button>
+                  <a
+                    href={sitePath(travelStationCopy.href)}
+                    aria-label={`${travelStationCopy.label}: ${travelStationCopy.compactLabel}`}
+                    style={{ '--item-color': deskStationColors.travel } as React.CSSProperties}
+                  >
+                    {travelStationCopy.compactLabel} ↗
+                  </a>
+                </nav>
               )}
               {tour >= 0 && (
                 <aside className="experience-tour" aria-label="Guided tour">

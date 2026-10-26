@@ -6,8 +6,9 @@ import { DeskModel } from "./DeskModel";
 import { DeskCamera, type CameraPose } from "./DeskCamera";
 import { lowerQuality, qualitySettings } from "./performance";
 import type { SceneProps } from "./types";
-import { stationCopy, type StationKey } from "@/content/portfolio";
+import { stationCopy, travelStationCopy, type StationKey } from "@/content/portfolio";
 import { deskStationColors } from "@/content/appearance";
+import { sitePath } from "@/lib/sitePath";
 
 class SceneBoundary extends Component<
   { onUnavailable: () => void; children: ReactNode },
@@ -50,13 +51,14 @@ export default function AdaptiveScene(props: SceneProps) {
     [pageVisible, setPageVisible] = useState(true),
     [portal, setPortal] = useState(false),
     [highlight, setHighlight] = useState<string | null>(null);
-  const labels = useRef<Record<string, HTMLButtonElement | null>>({});
+  const labels = useRef<Record<string, HTMLElement | null>>({});
   const clock = useRef<HTMLButtonElement>(null);
   const cameraPose = useRef<CameraPose | null>(null);
   const coffeeClick = () => {
     props.onNavigate("coffee");
   };
   const config = qualitySettings[props.quality];
+  const activeStation = highlight ?? props.focusedStation;
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => setVisible(entries[0].isIntersecting),
@@ -82,7 +84,7 @@ export default function AdaptiveScene(props: SceneProps) {
       <SceneBoundary onUnavailable={props.onUnavailable}>
         {/* Preserve antialiasing and native detail; quality reduction removes shadows first. */}
         <Canvas
-          dpr={[1, config.maxDpr]}
+          dpr={[1, props.compact ? Math.min(config.maxDpr, 1.75) : config.maxDpr]}
           performance={{ min: 0.5, debounce: 180 }}
           shadows={config.shadows ? "basic" : false}
           frameloop={running ? "always" : "demand"}
@@ -107,7 +109,7 @@ export default function AdaptiveScene(props: SceneProps) {
           onCreated={({ gl }) => {
             gl.domElement.setAttribute(
               "aria-label",
-              "Abhinav’s desk with a live clock, reading lamp and A•WAKE flask. Drag to rotate, scroll or pinch to zoom.",
+              "Abhinav’s desk with a live clock, reading lamp, A•WAKE flask and trekking backpack. Drag to rotate, scroll or pinch to zoom.",
             );
             gl.domElement.dataset.renderer = "r3f";
             gl.setClearColor(0x000000, 0);
@@ -146,6 +148,8 @@ export default function AdaptiveScene(props: SceneProps) {
             />
           )}
           <DeskCamera
+            compact={props.compact}
+            touring={props.focusedStation !== null}
             pose={cameraPose}
             angle={props.look.angle}
             speed={props.look.speed}
@@ -160,18 +164,20 @@ export default function AdaptiveScene(props: SceneProps) {
           <DeskModel
             motion={running}
             active={visible && pageVisible}
-            showClock={!portal}
+            showClock={!portal && !props.focusedStation}
+            showLabels={!portal && !props.focusedStation}
             flow={props.flow}
             look={props.look}
             arrival={props.arrival}
             lamp={props.lamp}
             atmosphere={props.atmosphere}
-            highlight={highlight}
+            highlight={activeStation}
             onHover={setHighlight}
             onOpen={props.onOpen}
             onCoffee={coffeeClick}
             onLamp={props.onLamp}
             onClock={() => props.onNavigate("clock")}
+            onTravel={props.onTravel}
             labels={labels}
             host={wrapper}
             clock={clock}
@@ -181,7 +187,7 @@ export default function AdaptiveScene(props: SceneProps) {
       <button
         ref={clock}
         className={`clock-banner ${highlight === "clock" ? "is-hovered" : ""}`}
-        hidden={portal}
+        hidden={portal || !!props.focusedStation}
         onClick={() => props.onNavigate("clock")}
         onMouseEnter={() => setHighlight("clock")}
         onMouseLeave={() => setHighlight(null)}
@@ -192,7 +198,7 @@ export default function AdaptiveScene(props: SceneProps) {
         <time>Local time</time>
         <small>Your timezone</small>
       </button>
-      <div className="projected-labels" hidden={portal}>
+      <div className="projected-labels" hidden={portal || !!props.focusedStation}>
         {(Object.keys(stationCopy) as StationKey[]).map((id) => (
           <button
             ref={(element) => {
@@ -200,7 +206,7 @@ export default function AdaptiveScene(props: SceneProps) {
             }}
             key={id}
             data-station={id}
-            className={`scene-label ${highlight === id ? "is-hovered" : ""}`}
+            className={`scene-label ${activeStation === id ? "is-hovered" : ""}`}
             style={
               {
                 "--item-color": deskStationColors[id],
@@ -215,9 +221,6 @@ export default function AdaptiveScene(props: SceneProps) {
             onClick={() => props.onOpen(id)}
           >
             <strong className="label-wide">{stationCopy[id].label}</strong>
-            <strong className="label-short">
-              {stationCopy[id].compactLabel}
-            </strong>
             <span>{stationCopy[id].invitation} ↗</span>
           </button>
         ))}
@@ -242,6 +245,21 @@ export default function AdaptiveScene(props: SceneProps) {
           <strong>A•WAKE</strong>
           <span>Take a coffee break ↗</span>
         </button>
+        <a
+          ref={(element) => { labels.current.travel = element; }}
+          data-station="travel"
+          className={`scene-label travel-scene-label ${activeStation === "travel" ? "is-hovered" : ""}`}
+          style={{ "--station-color": deskStationColors.travel, "--item-color": deskStationColors.travel } as React.CSSProperties}
+          href={sitePath(travelStationCopy.href)}
+          aria-label={`${travelStationCopy.label}: ${travelStationCopy.compactLabel}`}
+          onFocus={() => setHighlight("travel")}
+          onBlur={() => setHighlight(null)}
+          onMouseEnter={() => setHighlight("travel")}
+          onMouseLeave={() => setHighlight(null)}
+        >
+          <strong>{travelStationCopy.compactLabel}</strong>
+          <span>{travelStationCopy.invitation} ↗</span>
+        </a>
       </div>
     </div>
   );

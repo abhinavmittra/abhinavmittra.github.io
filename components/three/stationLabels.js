@@ -10,6 +10,7 @@ const overlap = (a, b) =>
 export function createStationLabels(host, stations, buttons) {
   let width = host.clientWidth,
     height = host.clientHeight;
+  const compact = matchMedia('(max-width: 800px)');
   const vector = new THREE.Vector3(),
     ns = "http://www.w3.org/2000/svg";
   const wires = document.createElementNS(ns, "svg");
@@ -83,6 +84,15 @@ export function createStationLabels(host, stations, buttons) {
     } = {},
   ) {
     if (!width || !height) return;
+    // Phones use an ordinary DOM story dock. Skip projection, collision allocation and wires entirely.
+    if (compact.matches) {
+      for (const entry of entries) {
+        entry.visible = false;
+        entry.button.hidden = true;
+        entry.wire.style.display = 'none';
+      }
+      return;
+    }
     const models = [];
     for (const entry of modelEntries) {
       const { station, bounds } = entry;
@@ -153,19 +163,7 @@ export function createStationLabels(host, stations, buttons) {
         for (let i = 0; i < candidates.length; i++)
           if (score(candidates[i], i) < score(candidates[best], best)) best = i;
       entry.choice = best;
-      let target = candidates[best];
-      if (width < 500) {
-        // On narrow screens, leave the miniature desk clear and connect compact edge labels to it.
-        const key = button.dataset.station,
-          right = key === "integrations" || key === "incident";
-        const top = key === "discovery" || key === "integrations";
-        target = {
-          x: key === "coldbrew" ? (width - w) / 2 : right ? width - w - 6 : 6,
-          y: key === "coldbrew" ? 88 : top ? 26 : height - h - 8,
-          w,
-          h,
-        };
-      }
+      const target = candidates[best];
       entry.x =
         snap || !entry.ready
           ? target.x

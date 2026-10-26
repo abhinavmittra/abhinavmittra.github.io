@@ -4,6 +4,7 @@ import { createWorkspaceSurroundings } from "./workspaceSurroundings";
 import { optimizeGeometry } from "./optimizeGeometry";
 import { deskPalette, deskStationColors } from "../../content/appearance";
 import { interfaceCopy } from "../../content/portfolio";
+import { createTravelCorner } from "./travelCorner";
 
 export const deskPositions = {
   discovery: [-2.6, 0, -1.35],
@@ -157,6 +158,7 @@ export function createRestoredDesk(onUpdate) {
   );
   function makeStation(key, w, d) {
     const group = new THREE.Group();
+    group.name = `Desk station: ${key}`;
     group.position.set(...deskPositions[key]);
     group.userData.station = key;
     world.add(group);
@@ -248,6 +250,10 @@ export function createRestoredDesk(onUpdate) {
   });
   stations.lamp = surroundings.lamp;
   stations.clock = models.deskClock.group;
+  const travelCorner = createTravelCorner({ world, tools });
+  stations.travel = travelCorner.bag;
+  surfaces.travel = travelCorner.fabric;
+  const surfaceColors = Object.fromEntries(Object.entries(surfaces).map(([key, mat]) => [key, mat.color.getHex()]));
   const paths = [
     [
       [-2.3, -0.08, -2.7],
@@ -381,7 +387,7 @@ export function createRestoredDesk(onUpdate) {
   function highlight(id) {
     for (const [key, mat] of Object.entries(surfaces)) {
       mat.color.set(
-        key === id ? deskStationColors[key] || "#efd594" : deskPalette.mat,
+        key === id ? deskStationColors[key] || "#efd594" : surfaceColors[key],
       );
       mat.emissive.set(
         key === id ? deskStationColors[key] || "#efd594" : "#000000",

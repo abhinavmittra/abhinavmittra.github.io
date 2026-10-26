@@ -9,6 +9,8 @@ export interface SceneCommand {
   target: StationKey | "overview" | "coffee" | "clock" | "zoom-in" | "zoom-out";
 }
 export interface SceneProps {
+  compact: boolean;
+  focusedStation: StationKey | null;
   motion: boolean;
   suspended: boolean;
   flow: boolean;
@@ -25,4 +27,5 @@ export interface SceneProps {
   onUnavailable: () => void;
   onNavigate: (target: SceneCommand["target"]) => void;
   onLamp: () => void;
+  onTravel: () => void;
 }

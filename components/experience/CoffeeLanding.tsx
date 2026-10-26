@@ -4,24 +4,17 @@ import { sitePath } from "@/lib/sitePath";
 export function CoffeeLanding() {
   return (
     <section className="coffee-portal-content" aria-labelledby="portal-title">
-      <div className="flex items-center justify-between gap-4">
+      <div className="coffee-portal-heading">
         <div className="portal-logo">
           <AwakeLogo />
         </div>
-        <a className="text-link" href={sitePath("/cold-brew/")}>
-          Full brew studio ↗
-        </a>
+        <h2 id="portal-title">A little time.<br />A proper cold brew.</h2>
       </div>
-      <h2 id="portal-title">
-        A little time.
-        <br />A proper cold brew.
-      </h2>
       <p>Steeped 48 Hours. Hits Fast.</p>
       <p className="muted">
-        Made at home in Jaipur. Real spices, zero syrups. Pick a flavour and
-        I’ll tell you what’s brewing.
+        Made at home in Jaipur. Real spices, zero syrups. Pick your flavour.
       </p>
-      <div className="grid gap-2 sm:grid-cols-3">
+      <div className="portal-flavours grid grid-cols-3 gap-2">
         {coldBrew.flavours.map((flavour) => (
           <a
             key={flavour.key}

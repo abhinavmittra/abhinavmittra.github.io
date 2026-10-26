@@ -203,6 +203,8 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 6px;
 }
+.desk-controls { min-width: 0; }
+.desk-controls > summary { display: none; }
 .motion-controls button {
   min-height: 40px;
   font-size: 13px;
@@ -328,6 +330,9 @@
 .scene-caption button {
   pointer-events: auto;
 }
+.mobile-station-nav { display: none; }
+.related-project-label { display: inline-flex; align-items: center; gap: 10px; }
+.related-awake-logo, .related-awake-logo svg { display: block; width: 36px; height: 36px; flex: none; }
 .systems-experience .text-link {
   display: inline-flex;
   align-items: center;
@@ -591,6 +596,11 @@
   display: grid;
   gap: 14px;
 }
+.coffee-portal-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
 .coffee-portal-content h2 {
   font-size: clamp(28px, 3vw, 40px);
 }
@@ -727,6 +737,17 @@
     grid-column: 1/-1;
     grid-template-columns: repeat(6, 1fr);
   }
+  .desk-controls { grid-column: 1/-1; }
+  .desk-controls > summary {
+    display: list-item;
+    min-height: 44px;
+    padding: 10px 0;
+    color: var(--exp-muted);
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .desk-controls:not([open]) > .motion-controls { display: none; }
+  .desk-controls[open] > .motion-controls { margin-top: 6px; }
   .profile-footer {
     grid-column: 1/-1;
     display: flex;
@@ -736,26 +757,77 @@
     gap: 8px;
   }
   .scene-stage {
-    height: 570px;
-    min-height: 570px;
+    height: auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    scroll-margin-top: 12px;
   }
-  .scene-label {
-    min-width: 110px;
-    padding: 8px;
+  .scene-stage > .adaptive-canvas {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: clamp(260px, 42svh, 360px);
+    flex: none;
   }
-  .scene-label span {
-    display: none;
+  .projected-labels { display: none; }
+  .mobile-station-nav {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
   }
-  .scene-label strong {
+  .mobile-station-nav :is(button, a) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 8px 5px;
+    border-radius: 6px;
+    border-left: 3px solid var(--item-color);
+    background: var(--exp-panel);
     font-size: 13px;
+    line-height: 1.2;
+    text-align: center;
+  }
+  .mobile-station-nav button[aria-pressed="true"] {
+    background: var(--item-color);
+    color: #172521;
+    font-weight: 600;
   }
   .scene-caption {
+    position: static;
     left: 0;
     right: 0;
   }
   .coffee-landing {
-    width: 50%;
+    position: relative;
+    inset: auto;
+    width: 100%;
+    transform: none;
+    padding: 14px;
+    backdrop-filter: none;
   }
+  .coffee-portal-content { gap: 10px; }
+  .coffee-portal-content h2 { font-size: clamp(22px, 5.5vw, 30px); line-height: 1.12; }
+  .coffee-portal-content > p { font-size: 14px; line-height: 1.4; }
+  .coffee-portal-heading { gap: 10px; }
+  .portal-logo { width: 44px; height: 44px; }
+  .portal-flavour { min-height: 66px; padding: 8px 5px; gap: 4px; font-size: 13px; }
+  .portal-flavour span { font-size: 12px; }
+  .experience-tour {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    padding: 14px;
+    gap: 10px;
+    backdrop-filter: none;
+  }
+  .experience-tour h2 { font-size: 22px; line-height: 1.15; }
+  .experience-tour p { font-size: 14px; line-height: 1.45; }
+  .experience-tour > div { flex-wrap: wrap; gap: 8px; }
+  .experience-tour .action { min-height: 44px; padding: 8px 10px; font-size: 13px; }
+  .back-to-board { top: 8px; left: 8px; font-size: 13px; min-height: 44px; }
   .content-panel {
     inset: 12px;
     max-height: calc(100dvh - 24px);
@@ -784,23 +856,6 @@
   .motion-controls {
     grid-template-columns: repeat(3, 1fr);
   }
-  .scene-stage {
-    min-height: 430px;
-    height: 430px;
-  }
-  .scene-stage.is-coffee {
-    height: 860px;
-  }
-  .scene-stage.is-coffee .adaptive-canvas {
-    height: 430px;
-  }
-  .coffee-landing {
-    top: auto;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    transform: none;
-  }
   .scene-caption {
     font-size: 13px;
     gap: 12px;
@@ -815,17 +870,14 @@
     font-size: 13px;
   }
   .experience-tour {
-    left: 0;
-    right: 0;
-    bottom: 10px;
     padding: 14px;
   }
   .experience-tour h2 {
     font-size: 22px;
   }
   .experience-tour p {
-    max-height: 100px;
-    overflow-y: auto;
+    max-height: none;
+    overflow: visible;
   }
   .minimal-projects > div:first-child {
     align-items: flex-start;
@@ -863,9 +915,6 @@
   min-width: 0;
   pointer-events: auto;
 }
-.label-short {
-  display: none !important;
-}
 @media (max-width: 800px) {
   .experience-header {
     display: grid;
@@ -880,16 +929,6 @@
     margin: 0;
     display: flex;
     gap: 4px 18px;
-  }
-  .projected-labels .scene-label {
-    width: 100px;
-    min-height: 44px;
-  }
-  .projected-labels .label-wide {
-    display: none;
-  }
-  .projected-labels .label-short {
-    display: block !important;
   }
 }
 @media (max-width: 500px) {

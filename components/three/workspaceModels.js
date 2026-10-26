@@ -80,19 +80,27 @@ export function createWorkspaceModels({world, software, makeStation, tools, acce
     const peak=mesh(createMountainGeometry(h,r,seed),mountainMaterial,f,x,.25,z);peak.name='Snow-lined mountain ridge';
   }
   for(const [x,z,h] of [[-1.30,-.22,.62],[1.2,-.75,.48],[-.35,-.94,.43]]){cylinder(.025,h*.4,copper,f,x,.28+h*.2,z);mesh(new THREE.ConeGeometry(h*.27,h*.8,7),material(p.olive),f,x,.3+h*.6,z);}
-  const cup=new THREE.Group();cup.position.set(1.04,.40,.77);cup.scale.setScalar(1.4);f.add(cup);mesh(new THREE.CylinderGeometry(.22,.17,.32,32,1,true),material(p.paper,{roughness:.3}),cup,0,.1,0);cylinder(.192,.015,material('#211a12'),cup,0,.235,0);const handle=mesh(new THREE.TorusGeometry(.12,.035,8,24),copper,cup,.23,.1,0);handle.rotation.y=Math.PI/2;
+  const cup=new THREE.Group();cup.position.set(.96,.40,.82);cup.scale.setScalar(1.4);f.add(cup);mesh(new THREE.CylinderGeometry(.22,.17,.32,32,1,true),material(p.paper,{roughness:.3}),cup,0,.1,0);cylinder(.192,.015,material('#211a12'),cup,0,.235,0);const handle=mesh(new THREE.TorusGeometry(.12,.035,8,24),copper,cup,.23,.1,0);handle.rotation.y=Math.PI/2;
   cup.name='Trail coffee cup';layers.push({mesh:cup,y:cup.position.y,index:2});
   for(let i=0;i<2;i++){const steam=line([[0,0,0],[.06,.14,.03],[-.04,.3,0],[.03,.46,-.03]],new THREE.MeshBasicMaterial({color:p.paper,transparent:true,opacity:.25}),cup,.008);steam.position.set(i*.08-.04,.25,0);animated.push({mesh:steam,type:'steam',phase:i});}
-  const notebook=box(.64,.07,.84,material(p.olive),f,-.76,.33,.9);notebook.rotation.y=-.22;box(.54,.015,.72,paper,notebook,0,.04,0);box(.025,.025,.8,copper,notebook,-.23,.05,0);
+  // Camera, route notebook and coffee form a clear front row beneath the mountains.
+  const notebook=box(.64,.07,.78,material(p.olive),f,-.02,.33,.82);notebook.name='Travel notebook';notebook.rotation.y=-.08;box(.54,.015,.68,paper,notebook,0,.04,0);box(.025,.025,.74,copper,notebook,-.23,.05,0);
 
-  const map=rounded(.9,.64,.016,paper,f,-.8,.42,.9,.015);map.rotation.y=-.22;
+  const map=rounded(.86,.6,.016,paper,f,-.02,.42,.82,.015);map.name='Folded route map';map.rotation.y=-.08;
   line([[-.32,.02,.15],[-.12,.02,-.1],[.12,.02,.08],[.34,.02,-.17]],material(p.olive),map,.008);
   for(const [x,z] of [[-.32,.15],[.12,.08],[.34,-.17]])cylinder(.025,.018,copper,map,x,.025,z);
-  const camera=new THREE.Group();camera.name='Backpacking camera';camera.position.set(-1.14,.53,.52);camera.scale.setScalar(1.65);camera.rotation.y=.35;f.add(camera);
-  rounded(.42,.2,.29,dark,camera,0,0,0,.035);
-  const lens=cylinder(.1,.12,silver,camera,0,0,.14);lens.rotation.x=Math.PI/2;
-  const lensGlass=cylinder(.074,.012,material(p.periwinkle),camera,0,0,.21);lensGlass.rotation.x=Math.PI/2;
-  box(.13,.09,.16,dark,camera,0,.18,0);box(.07,.025,.06,copper,camera,-.12,.16,0);
+  const camera=new THREE.Group();camera.name='Backpacking camera';camera.position.set(-1.17,.56,.82);camera.scale.setScalar(1.5);camera.rotation.y=.18;f.add(camera);
+  rounded(.48,.24,.3,dark,camera,0,0,0,.04);
+  rounded(.09,.28,.32,dark,camera,.22,-.005,.02,.025);
+  box(.44,.035,.22,silver,camera,0,.15,0);
+  const lens=cylinder(.12,.19,dark,camera,-.035,0,.19);lens.rotation.x=Math.PI/2;
+  for(const z of [.13,.21,.27]){const rim=mesh(new THREE.TorusGeometry(.12,.012,5,24),silver,camera,-.035,0,z);rim.name='Camera lens ring';}
+  const lensGlass=cylinder(.092,.012,material(p.periwinkle,{roughness:.15,metalness:.35}),camera,-.035,0,.29);lensGlass.rotation.x=Math.PI/2;
+  box(.14,.095,.17,dark,camera,-.025,.195,-.015);
+  cylinder(.037,.025,copper,camera,.16,.19,0);
+  cylinder(.032,.025,silver,camera,-.16,.19,0);
+  for(let i=0;i<4;i++)box(.045,.011,.012,silver,camera,.235,-.08+i*.045,.166);
+  line([[-.23,.07,0],[-.36,-.04,.03],[-.34,-.14,.15],[-.23,-.1,.17]],dark,camera,.012);
 
   const deskBottle=createColdBrewBottle({software,onUpdate,detail:"desk"});deskBottle.group.scale.setScalar(.43);deskBottle.group.position.set(-.06,.29,.83);deskBottle.group.userData.station='coldbrew';f.add(deskBottle.group);
   layers.push({mesh:deskBottle.group,y:deskBottle.group.position.y,index:3});

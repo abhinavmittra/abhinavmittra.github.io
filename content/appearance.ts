@@ -7,6 +7,7 @@ export const deskStationColors: Record<string, string> = {
   integrations: coldBrew.palette.sand,
   fieldnotes: "#9eab72",
   coldbrew: coldBrew.palette.olive,
+  travel: coldBrew.palette.periwinkle,
   lamp: coldBrew.palette.sand,
 };
 
