@@ -20,7 +20,7 @@ The Pages workflow builds with no `basePath`, matching the user-site domain root
 
 ## GitHub Actions setup
 
-The workflow at `.github/workflows/pages.yml` runs checks and a static build for pull requests, and publishes on pushes to `main` or `migration/nextjs-typescript`. It uploads only `out/` as the Pages artifact. To enable publishing, open repository **Settings → Pages** and choose **GitHub Actions** as the build and deployment source. No deploy token or secret is needed.
+The workflow at `.github/workflows/pages.yml` runs checks and a static build for pull requests, and publishes on pushes to `main` or `migration/nextjs-typescript`. It uploads only `out/` as the Pages artifact. To enable publishing, open repository **Settings → Pages** and choose **GitHub Actions** as the build and deployment source. In **Settings → Environments → github-pages**, allow both `main` and `migration/nextjs-typescript` under deployment branches so the in-progress branch can deploy before its pull request is merged. No deploy token or secret is needed.
 
 After merging the current branch into `main`, the `main` trigger keeps publishing from the default branch. The migration branch trigger is included so the current app can be published while the migration branch is active; remove that trigger after the branch is retired if desired.
 
