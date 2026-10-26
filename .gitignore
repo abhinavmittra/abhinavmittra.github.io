@@ -3,8 +3,14 @@ node_modules/
 /out/
 *.tsbuildinfo
 .sites/
+.taste-skill/
 artifacts/
 .DS_Store
+.vscode/
+.agents/
+**/AGENTS.md
+skills-lock.json
+SOURCE_COMMIT.txt
 
 .env
 .env.*

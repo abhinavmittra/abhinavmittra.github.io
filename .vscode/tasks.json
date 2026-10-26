@@ -1,9 +1,0 @@
-{
-  "version": "2.0.0",
-  "tasks": [
-    {"label":"Start Systems Desk","type":"shell","command":"npm run dev","isBackground":true,"problemMatcher":[]},
-    {"label":"Check app","type":"shell","command":"npm run check","problemMatcher":[],"group":{"kind":"test","isDefault":true}},
-    {"label":"Build static site","type":"shell","command":"npm run build","problemMatcher":[]},
-    {"label":"Preview static site","type":"shell","command":"npm run preview","isBackground":true,"problemMatcher":[]}
-  ]
-}

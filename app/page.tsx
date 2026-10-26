@@ -1,6 +1,3 @@
-import { Workspace } from '@/components/workspace/Workspace';
-import { WorkspaceMarkup } from '@/components/workspace/WorkspaceMarkup';
+import { Experience } from '@/components/experience/Experience';
 
-export default function HomePage() {
-  return <Workspace><WorkspaceMarkup /></Workspace>;
-}
+export default function HomePage() { return <Experience/>; }
