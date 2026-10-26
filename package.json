@@ -1,0 +1,35 @@
+{
+  "name": "abhinav-systems-desk-3d",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.2",
+    "d3-geo": "^3.1.1",
+    "next": "^16.4.3",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "three": "0.186.1"
+  },
+  "version": "0.1.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1 --port 4173",
+    "build": "next build",
+    "preview": "node scripts/dev-server.mjs out",
+    "check": "tsc --noEmit && node --check components/cold-brew/brewScene.js && node --check components/travel/travelGlobe.js && node --check scripts/dev-server.mjs && node scripts/test-travel-geography.mjs && node scripts/test-map-colours.mjs && node scripts/test-brew-motion.mjs && node scripts/test-clock.mjs && node --experimental-strip-types scripts/test-experience.mts && node scripts/check-docs.mjs && node scripts/audit-assets.mjs",
+    "audit:assets": "node scripts/audit-assets.mjs"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/three": "^0.186.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2"
+  },
+  "license": "MIT"
+}

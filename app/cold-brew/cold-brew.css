@@ -1,0 +1,291 @@
+body:has(.brew-studio) { height: auto; min-height: 100dvh; overflow: auto; background: #f2eee4; }
+.brew-studio {
+  --brew-bg: #f2eee4;
+  --brew-surface: #e4dccb;
+  --brew-ink: #292f2d;
+  --brew-muted: #5b5e53;
+  --brew-accent: #39471f;
+  position: relative;
+  min-height: 100dvh;
+  background: var(--brew-bg);
+  color: var(--brew-ink);
+  font: 16px/1.55 system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color-scheme: light;
+  scroll-behavior: smooth;
+}
+.brew-studio button, .brew-studio a { color: inherit; }
+.brew-studio button { border-radius: 0; min-height: 44px; }
+.brew-studio :focus-visible { outline: 3px solid var(--brew-accent); outline-offset: 4px; }
+.brew-header { position: relative; z-index: 5; min-height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 10px 32px; background: var(--brew-bg); }
+.brew-header > a { font-size: 14px; }
+.brew-brand { display: flex; align-items: center; gap: 12px; }
+.brew-brand span { font-size: 16px; font-weight: 550; }
+.brew-brand img { display: block; object-fit: cover; }
+.brew-layout { display: grid; grid-template-columns: 55% 45%; align-items: start; background: #d2c3a5; }
+.brew-stage { position: sticky; top: 0; height: calc(100dvh - 64px); min-height: 600px; background: #d2c3a5; }
+.brew-stage-title { position: absolute; z-index: 1; left: 32px; right: 32px; top: 26px; display: flex; gap: 20px; justify-content: space-between; align-items: baseline; pointer-events: none; }
+.brew-stage-title h2 { font-size: 16px; line-height: 1.3; margin: 0; font-weight: 450; }
+.brew-stage-title span { color: var(--brew-muted); font-size: 13px; text-align: right; }
+.brew-scene { position: absolute; inset: 0; overflow: hidden; }
+.brew-scene > canvas, .brew-scene > svg { display: block; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+.brew-scene > canvas:active, .brew-scene > svg:active { cursor: grabbing; }
+.brew-scene-footer { position: absolute; bottom: 28px; left: 32px; right: 32px; display: flex; justify-content: space-between; gap: 20px; align-items: center; }
+.brew-scene-footer p { color: var(--brew-muted); font-size: 13px; margin: 0; }
+.brew-scene-footer > div { display: flex; gap: 6px; }
+.brew-scene-footer button { background: var(--brew-surface); padding: 8px 12px; font-size: 13px; }
+.brew-scene-footer button[aria-pressed=true] { color: var(--brew-accent); }
+.brew-reading { padding: 24px 32px 30px; background: var(--brew-bg); }
+.brew-reading h1 { font: 650 clamp(42px, 4vw, 64px)/.95 system-ui, sans-serif; letter-spacing: -.055em; margin: 0 0 24px; }
+.brew-reading h2 { font-size: 28px; font-weight: 500; line-height: 1.1; letter-spacing: -.035em; margin: 0 0 12px; }
+.brew-reading h3 { font-size: 24px; font-weight: 500; line-height: 1.15; letter-spacing: -.025em; margin: 0 0 8px; }
+.brew-reading p { margin: 0 0 12px; max-width: 46ch; }
+.brew-location { font-size: 18px; }
+.brew-selection { margin-top: 36px; }
+.brew-flavours { display: flex; gap: 6px; flex-wrap: wrap; }
+.brew-flavours button { flex: 1; background: var(--brew-surface); padding: 12px 14px; font-size: 14px; white-space: nowrap; }
+.brew-flavours button[aria-pressed=true] { background: var(--brew-accent); color: #f4f1e8; }
+.brew-flavour-copy { margin-top: 24px; }
+.brew-flavour-copy p { margin-bottom: 10px; }
+.brew-tasting { color: var(--brew-muted); font-size: 14px; }
+.brew-product-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 18px; }
+.brew-product-heading h3 { margin: 0; }
+.brew-price { display: flex; flex-direction: column; align-items: flex-end; gap: 0; margin: 0; flex-shrink: 0; }
+.brew-price strong { font-size: 44px; font-weight: 450; letter-spacing: -.04em; }
+.brew-price span { color: var(--brew-muted); font-size: 14px; }
+.brew-order { display: flex; justify-content: space-between; align-items: center; gap: 20px; width: 100%; min-height: 52px; background: var(--brew-accent); color: #f4f1e8 !important; padding: 14px 20px; font-size: 16px; }
+.brew-availability { color: var(--brew-muted); font-size: 14px; margin-top: 18px !important; }
+.brew-about { margin-top: 56px; }
+.brew-about > a { display: inline-block; font-size: 14px; padding-block: 10px; text-decoration: underline; text-underline-offset: 5px; }
+.brew-quick-flavours, .brew-mobile-order { display: none; }
+.brew-studio a:hover, .brew-studio button:hover { filter: brightness(1.1); }
+.brew-studio button:active, .brew-order:active { transform: translateY(1px); }
+@media(max-width:1100px) and (min-width:801px) {
+  .brew-reading { padding: 24px 28px 28px; }
+  .brew-flavours button { padding-inline: 10px; font-size: 13px; }
+  .brew-scene-footer { flex-wrap: wrap; }
+}
+@media(max-width:800px) {
+  .brew-header { min-height: 64px; gap: 12px; padding: 14px 20px; }
+  .brew-brand img { display: none; }
+  .brew-brand span { font-size: 13px; }
+  .brew-header > a { font-size: 13px; }
+  .brew-layout { display: flex; flex-direction: column; }
+  .brew-stage { position: relative; top: auto; width: 100%; height: 56dvh; min-height: 410px; }
+  .brew-stage-title { top: 18px; left: 20px; right: 20px; }
+  .brew-stage-title h2 { font-size: 14px; }
+  .brew-stage-title span { max-width: 130px; }
+  .brew-scene-footer { bottom: 14px; left: 20px; right: 20px; gap: 8px; flex-wrap: wrap; }
+  .brew-scene-footer p { font-size: 13px; }
+  .brew-scene-footer p { display: none; }
+  .brew-scene-footer > div { margin-left: auto; }
+  .brew-scene-footer button { padding: 7px 10px; }
+  .brew-quick-flavours { position: absolute; bottom: 68px; left: 20px; right: 20px; display: flex; gap: 4px; }
+  .brew-quick-flavours button { flex: 1; background: var(--brew-surface); font-size: 13px; padding: 8px 4px; }
+  .brew-quick-flavours button[aria-pressed=true] { color: #f4f1e8; background: var(--brew-accent); }
+  .brew-reading { padding: 36px 20px 28px; width: 100%; }
+  .brew-reading h1 { font-size: clamp(44px, 12vw, 64px); }
+  .brew-reading h1 br { display: block; }
+  .brew-selection { margin-top: 46px; }
+  .brew-flavours { gap: 4px; }
+  .brew-flavours button { font-size: 13px; padding-inline: 10px; }
+  .brew-about { margin-top: 72px; }
+  .brew-mobile-order { width: 100%; display: flex; gap: 16px; align-items: center; justify-content: space-between; padding: 12px 20px; background: var(--brew-bg); font-size: 14px; }
+  .brew-mobile-order a { background: var(--brew-accent); color: #f4f1e8; min-height: 44px; display: flex; align-items: center; padding: 10px 16px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .brew-studio { scroll-behavior: auto; }
+  .brew-studio *, .brew-studio *::before { animation-duration: .001s !important; transition-duration: .001s !important; }
+}
+
+.brew-header nav { display:flex; gap:22px; font-size:14px; }
+.brew-stage-title span { color:#414638; }
+.brew-scene-footer p { color:#414638; }
+.brew-reading > section[id], .brew-selection { scroll-margin-top:30px; }
+.brew-beans { margin-top:48px; }
+.brew-species, .brew-roasts, .brew-moment-options { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:12px; }
+.brew-species button, .brew-roasts button, .brew-moment-options button { background:var(--brew-surface); padding:10px 14px; font:inherit; font-size:14px; flex:1; }
+.brew-studio button[aria-pressed=true] { background:var(--brew-accent); color:#f4f1e8; }
+.brew-reference { display:inline-block; padding-block:8px; text-decoration:underline; text-underline-offset:4px; font-size:14px; }
+.brew-roast-display { margin-top:18px; background:#e4dccb; padding:18px 20px; display:flex; align-items:center; gap:20px; }
+.brew-roast-display svg { width:75%; max-height:180px; color:var(--roast-color); transition:color .5s; }
+.brew-roast-display span { font-size:24px; letter-spacing:-.03em; }
+.brew-roasts { margin-top:6px; }
+.brew-roast-copy { min-height:0; }
+.brew-note { color:var(--brew-muted); font-size:14px; }
+.brew-process { margin-top:48px; }
+.brew-process ol { list-style:none; margin:0; padding:0; counter-reset:coffee; }
+.brew-process li { position:relative; padding:0 0 22px 42px; counter-increment:coffee; }
+.brew-process li::before { content:counter(coffee); position:absolute; left:0; top:-2px; font-size:25px; color:var(--brew-accent); }
+.brew-process li h3 { font-size:22px; margin-bottom:8px; }
+.brew-moments { margin-top:80px; }
+.brew-moodboard { background:#e4dccb; }
+.brew-moodboard > div:last-child { padding:26px; }
+.brew-moodboard ul { list-style:none; padding:0; display:flex; gap:8px 16px; flex-wrap:wrap; font-size:14px; color:var(--brew-muted); }
+.brew-mood-art { position:relative; height:240px; background:#bba77e; overflow:hidden; }
+.brew-mood-art > span { position:absolute; bottom:18px; right:18px; width:27px; height:45px; }
+.brew-mood-art > span:nth-last-child(2) { right:49px; }.brew-mood-art > span:nth-last-child(3) { right:80px; }
+.brew-facts { margin-top:80px; background:#39471f; color:#f4f1e8; padding:28px; }
+.brew-facts details { margin:0 0 18px; }.brew-facts summary { cursor:pointer; padding:10px 0; font-size:18px; }.brew-facts details p { margin:12px 0; font-size:16px; }.brew-facts a { font-size:13px; }
+.brew-about { margin-top:80px; }
+@media(max-width:1100px) { .brew-header nav {gap:16px;} .brew-brand span {display:none;} }
+@media(max-width:800px) { .brew-header nav {gap:12px;} .brew-header nav a {font-size:13px;} .brew-header nav a:nth-child(2) {display:none;} .brew-brand {display:none;} .brew-facts {padding:24px 20px;} .brew-moodboard > div:last-child {padding:24px 20px;} .brew-roast-display {padding-inline:10px; gap:6px;} .brew-roasts button {padding-inline:10px;} }
+
+.brew-moodboard ul { color:#514334; }
+@media(max-width:800px) { .brew-scene { top:32px; bottom:110px; } .brew-stage { min-height:440px; } }
+
+/* Use the exact supplied A•WAKE artwork, without redrawing its mountain mark or lettering. */
+.awake-logo { display:block; width:100%; height:auto; }
+.brew-brand .awake-logo-compact { width:44px; height:44px; object-fit:contain; }
+.brew-brand .awake-brand-name { display:inline; font-size:18px; font-weight:650; white-space:nowrap; }
+.brew-brand-intro { display:grid; grid-template-columns:minmax(0,1fr) clamp(96px,10vw,132px); gap:16px; align-items:center; margin-bottom:14px; }
+.brew-brand-intro h1 { margin:0; font-size:clamp(40px,3.65vw,58px); letter-spacing:-.045em; }
+.brew-reading .brew-performance { font-size:24px; line-height:1.2; letter-spacing:-.025em; margin-bottom:20px; }
+@media(max-width:1100px) { .brew-brand .awake-brand-name { display:inline; font-size:15px; } }
+@media(max-width:800px) { .brew-brand { display:none; } .brew-brand-intro { grid-template-columns:minmax(0,1fr) 104px; gap:12px; } .brew-brand-intro h1 { font-size:clamp(40px,10.8vw,56px); } .brew-reading .brew-performance { font-size:22px; } }
+
+/* Graphite navigation ties the coffee studio back to the Systems Desk. */
+.brew-header { background:#232a30; color:#f1f4f6; }
+.brew-header :focus-visible { outline-color:#efd594; }
+.brew-brand .awake-logo-compact { width:48px; height:46px; object-fit:contain; }
+.brew-stage { --brew-muted:#414638; }
+.brew-studio { --brew-sand:#efd594; --brew-periwinkle:#7d89d9; --brew-deep:#271b72; }
+.brew-flavours button, .brew-quick-flavours button { border-bottom:4px solid var(--flavour-color); }
+.brew-flavours button[aria-pressed=true], .brew-quick-flavours button[aria-pressed=true] { background:var(--flavour-color); color:var(--flavour-ink); }
+.brew-roast-display { background:var(--brew-surface); }
+
+@media(max-width:800px) { .brew-reading { padding-top:24px; } .brew-brand-intro { margin-bottom:16px; } }
+
+/* Purchase beside the flavour palette; catalogue navigation stays with the story. */
+.brew-stage-title { align-items:flex-start; }
+.brew-stage-title .brew-price { line-height:1; gap:6px; }
+.brew-stage-title .brew-price strong { font-size:38px; }
+.brew-stage-title .brew-price span { font-size:14px; }
+.brew-scene { inset:62px 0 150px; }
+.brew-purchase-bar { position:absolute; bottom:76px; left:32px; right:32px; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; align-items:stretch; }
+.brew-purchase-bar .brew-quick-flavours { position:static; inset:auto; display:flex; min-width:0; gap:5px; }
+.brew-purchase-bar .brew-quick-flavours button { flex:1; min-width:0; padding:10px 8px; background:var(--brew-surface); font-size:14px; line-height:1.25; }
+.brew-purchase-bar .brew-order { width:auto; padding:12px 18px; font-size:14px; gap:18px; white-space:nowrap; }
+.brew-scene-footer { bottom:12px; }
+.brew-product-heading { gap:12px; }
+.brew-catalog-nav { display:flex; flex:none; gap:6px; }
+.brew-catalog-nav button { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; min-width:84px; padding:4px 6px; background:var(--brew-surface); color:var(--brew-accent); }
+.brew-catalog-nav button span { font-size:13px; }
+.brew-catalog-nav button svg { flex:none; transition:transform 180ms ease; }
+.brew-catalog-nav .brew-previous:hover svg { transform:translateX(-2px); }
+.brew-catalog-nav .brew-next:hover svg { transform:translateX(2px); }
+.brew-flavour-copy { margin-top:0; }
+.brew-roast-display { display:grid; grid-template-columns:minmax(0,1fr) 90px; gap:12px; min-height:150px; }
+.brew-roast-display svg { display:block; width:100%; height:130px; max-height:none; color:var(--roast-color); }
+.brew-roast-display > span { font-size:24px; }
+.brew-renderer-status { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); }
+.brew-renderer-status.is-error { width:auto; height:auto; margin:0; top:90px; left:32px; right:32px; padding:16px; background:var(--brew-surface); clip-path:none; z-index:2; }
+@media(min-width:801px) and (max-width:1200px) {
+  .brew-purchase-bar { grid-template-columns:1fr; gap:8px; }
+  .brew-purchase-bar .brew-order { justify-content:space-between; }
+  .brew-scene { bottom:208px; }
+}
+@media(max-width:800px) {
+  .brew-stage { height:60dvh; min-height:540px; }
+  .brew-stage-title { top:18px; }
+  .brew-stage-title .brew-price strong { font-size:34px; }
+  .brew-stage-title .brew-price span { max-width:none; }
+  .brew-scene { inset:62px 0 204px; }
+  .brew-purchase-bar { left:20px; right:20px; bottom:78px; grid-template-columns:1fr; gap:8px; }
+  .brew-purchase-bar .brew-quick-flavours button { min-height:44px; font-size:13px; padding:8px 6px; }
+  .brew-purchase-bar .brew-order { justify-content:space-between; min-height:48px; }
+  .brew-scene-footer { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:center; bottom:12px; }
+  .brew-scene-footer p { display:block; font-size:13px; line-height:1.35; }
+  .brew-scene-footer > div { margin-left:0; }
+  .brew-scene-footer button { font-size:13px; padding-inline:8px; }
+  .brew-selection { margin-top:32px; }
+  .brew-roast-display { grid-template-columns:minmax(0,1fr) 80px; padding-inline:12px; gap:6px; }
+}
+@media(prefers-reduced-motion:reduce) { .brew-catalog-nav button:hover svg { transform:none; } }
+.brew-purchase-bar .brew-quick-flavours button[aria-pressed=true] { background:var(--flavour-color); color:var(--flavour-ink); }
+
+/* A compact field guide: the bottle leads, typography stays light on its feet. */
+.brew-studio { font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; line-height:1.5; }
+.brew-studio button, .brew-order { font-family:inherit; font-weight:550; letter-spacing:-.015em; }
+.brew-brand-intro h1 { color:var(--brew-accent); font-weight:600; line-height:.98; }
+.brew-reading .brew-performance { font-size:22px; margin-bottom:12px; }
+.brew-header nav { margin-left:auto; }
+.brew-origins { margin:20px 0 24px; }
+.brew-origins > h3 { font-size:22px; }
+.brew-origin-options { display:flex; gap:4px; margin:12px 0 6px; }
+.brew-origin-options button { flex:1; min-width:0; padding:8px 10px; font-size:13px; line-height:1.25; background:var(--brew-surface); }
+.brew-origin-card { padding:20px; background:var(--origin-bg); color:var(--origin-ink); }
+.brew-origin-card h4 { margin:0 0 10px; font-size:24px; line-height:1.1; letter-spacing:-.035em; font-weight:550; }
+.brew-origin-card p { font-size:14px; max-width:none; }
+.brew-origin-card .brew-origin-kind { font-size:13px; margin-bottom:8px; }
+.brew-origin-process { display:flex; list-style:none; gap:6px; padding:0; margin:16px 0; font-size:13px; font-weight:550; }
+.brew-origin-process li { display:flex; align-items:center; gap:6px; }
+.brew-origin-process li:not(:last-child)::after { content:'→'; opacity:.65; }
+.brew-origin-card dl { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:0 0 12px; }
+.brew-origin-card dt { font-size:13px; margin-bottom:4px; }
+.brew-origin-card dd { margin:0; font-size:16px; font-weight:550; line-height:1.3; }
+.brew-origin-card small { display:block; font-size:13px; font-weight:400; line-height:1.45; margin-top:5px; }
+.brew-origin-card .brew-origin-detail { margin-bottom:8px; }
+.brew-origin-card summary { cursor:pointer; font-size:13px; min-height:44px; align-content:center; }
+.brew-origin-card nav { display:grid; }
+.brew-origin-card a { font-size:13px; text-decoration:underline; text-underline-offset:3px; padding-block:8px; }
+.brew-origin-card :focus-visible { outline-color:currentColor; }
+.brew-origins > .brew-note:last-child { margin-top:8px; }
+.brew-species-copy h3 { font-size:22px; }
+.brew-species-copy p, .brew-roast-copy p { font-size:16px; }
+.brew-species-copy p:last-child { margin-bottom:4px; }
+.brew-roast-copy h3 { font-size:22px; }
+.brew-roast-display { padding-block:8px; }
+.brew-reading .brew-note { margin-bottom:6px; }
+.brew-roasts { margin-bottom:12px; }
+@media(max-width:1100px) and (min-width:801px) {
+  .brew-product-heading { flex-wrap:wrap; gap:10px; }
+  .brew-catalog-nav { margin-left:auto; }
+}
+@media(max-width:800px) {
+  .brew-header { padding-block:10px; }
+  .brew-header nav { gap:14px; }
+  .brew-origin-card { padding:16px; }
+  .brew-product-heading { flex-wrap:wrap; }
+  .brew-catalog-nav { margin-left:auto; }
+  .brew-beans, .brew-process, .brew-moments, .brew-facts, .brew-about { margin-top:40px; }
+}
+
+/* Reading density: a single 14px rhythm, including on small screens. */
+.brew-reading { display:flex; flex-direction:column; gap:14px; padding:16px 24px; }
+.brew-reading > section { display:flex; flex-direction:column; gap:10px; margin:0; }
+.brew-reading :is(h1,h2,h3,h4,p,ul,ol,dl,nav,details) { margin-block:0; }
+.brew-reading .brew-availability { margin-top:0!important; }
+.brew-reading .brew-brand-intro,.brew-reading .brew-product-heading { margin:0; gap:12px; }
+.brew-reading .brew-flavour-copy { display:grid; gap:10px; margin:0; }
+.brew-reading .brew-flavour-copy [aria-live] { display:grid; gap:6px; }
+.brew-reading .brew-origins { display:grid; gap:8px; margin:0; }
+.brew-reading .brew-origin-card { display:grid; gap:10px; padding:14px; }
+.brew-reading .brew-origin-card dl { gap:12px; }
+.brew-reading .brew-origin-options,.brew-reading .brew-species,.brew-reading .brew-roasts { margin:0; }
+.brew-reading .brew-species-copy,.brew-reading .brew-roast-copy { display:grid; gap:8px; }
+.brew-reading .brew-process ol { display:grid; gap:12px; }
+.brew-reading .brew-process li { padding-block:0; }
+.brew-reading .brew-process li p { margin-top:6px; }
+.brew-reading .brew-moodboard > div:last-child { display:grid; gap:10px; padding:14px; }
+.brew-reading .brew-mood-art { height:180px; }
+.brew-reading .brew-facts { padding:14px; }
+.brew-reading .brew-facts details { margin:0; }
+.brew-reading .brew-facts summary { padding:8px 0; }
+.brew-reading .brew-facts details p { margin:0 0 8px; }
+.brew-reading .brew-about { gap:8px; }
+.brew-reading .brew-about > a { min-height:32px; padding-block:4px; }
+.brew-reading .brew-about br { display:none; }
+.brew-volume { margin:5px 0 0; font-size:14px; color:var(--brew-muted); }
+@media(max-width:800px) { .brew-reading { padding:16px 20px; } }
+.brew-reading :is(h1,h2,h3,h4,p) { margin-block:0!important; }
+.brew-reading .brew-brand-intro { grid-template-columns:minmax(0,1fr) 104px; }
+.brew-reading .brew-flavour-copy { grid-template-columns:minmax(0,1fr) auto; align-items:start; gap:8px 12px; }
+.brew-reading .brew-product-heading { display:contents; }
+.brew-reading .brew-product-heading h3 { grid-column:1; grid-row:1; }
+.brew-reading .brew-catalog-nav { grid-column:2; grid-row:1 / span 2; margin:0; }
+.brew-reading .brew-flavour-copy > [aria-live] { grid-column:1; grid-row:2; }
+.brew-catalog-nav button { min-width:72px; padding:4px; }
+.brew-catalog-nav button svg { width:76px; height:38px; }
+/* Full scenes follow the selected occasion, rather than recolouring a prop. */
+.brew-reading .brew-mood-art { height:auto; min-height:0; background:none; }
+.coffee-moment-scene { display:block; width:100%; height:auto; }

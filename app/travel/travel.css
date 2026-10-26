@@ -1,0 +1,82 @@
+body:has(.travel-atlas) { height:auto; overflow:auto; min-height:100dvh; background:#15191d; }
+.travel-atlas { --travel-paper:#f2eee4; --travel-muted:#b8c3cb; --travel-olive:#b6c7a3; background:#15191d; color:var(--travel-paper); font:16px/1.5 system-ui,sans-serif; min-height:100dvh; }
+.travel-atlas button,.travel-atlas a { min-height:44px; font:inherit; }
+.travel-atlas :focus-visible { outline:2px solid #efd594; outline-offset:4px; }
+.travel-header { display:flex; justify-content:space-between; align-items:center; gap:20px; padding:12px 4%; }
+.travel-header a { display:inline-flex; align-items:center; font-size:14px; }
+.travel-header nav { display:flex; gap:24px; }
+.travel-intro { display:flex; justify-content:space-between; align-items:center; gap:40px; padding:26px 4% 24px; }
+.travel-intro h1 { margin:0 0 14px; font:550 clamp(34px,5.1vw,74px)/1.06 system-ui,sans-serif; letter-spacing:-.045em; }
+.travel-intro p { max-width:62ch; margin:0; color:var(--travel-muted); }
+.travel-progress { flex:none; display:grid; grid-template-columns:auto auto; align-items:baseline; gap:0 12px; }
+.travel-progress strong { grid-row:span 2; font-size:46px; font-weight:450; letter-spacing:-.04em; color:#efd594; }
+.travel-progress span,.travel-progress p,.travel-progress a { font-size:13px; }
+.travel-progress a { grid-column:1/-1; color:var(--travel-muted); display:flex; align-items:center; }
+.travel-explorer { padding:0 4%; }
+.travel-list-heading { display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:12px; }
+.travel-list-heading h2 { font-size:20px; font-weight:450; margin:0; letter-spacing:-.02em; }
+.travel-list-heading span { font-size:13px; color:var(--travel-muted); }
+.travel-countries { display:flex; flex-wrap:wrap; gap:6px; }
+.travel-countries button { display:flex; align-items:center; gap:8px; padding:6px 10px; background:#232a30; font-size:13px; color:var(--travel-paper); }
+.travel-countries img { object-fit:contain; }
+.travel-countries button:hover { background:#343e43; }
+.travel-countries button[aria-pressed=true] { background:#efd594; color:#292f2d; }
+.travel-globe-layout { display:grid; grid-template-columns:minmax(0,1.55fr) minmax(270px,1fr); align-items:center; gap:4%; }
+.travel-globe-stage { position:relative; min-width:0; }
+.travel-globe { height:clamp(390px,51vw,650px); touch-action:none; }
+.travel-globe > canvas,.travel-globe > svg { width:100%; height:100%; display:block; cursor:grab; touch-action:none; }
+.travel-globe > :active { cursor:grabbing; }
+.travel-globe-controls { display:flex; align-items:center; flex-wrap:wrap; gap:8px; padding-bottom:16px; }
+.travel-globe-controls button,.travel-next button { background:#232a30; color:var(--travel-paper); padding:8px 14px; font-size:13px; }
+.travel-globe-controls button[aria-pressed=true] { background:#39471f; }
+
+.travel-atlas button:disabled { opacity:.6; cursor:default; }
+.travel-map-status { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+.travel-map-status.has-error { inset:40% 20px auto; width:auto; height:auto; clip-path:none; padding:20px; background:#232a30; }
+.travel-map-status button { display:block; margin-top:10px; color:#efd594; }
+.travel-country-note { padding:24px 0; min-width:0; }
+.travel-selected { display:flex; gap:16px; align-items:flex-start; }
+.travel-selected img { margin-top:6px; object-fit:contain; }
+.travel-selected h2 { margin:0; font-size:32px; font-weight:450; line-height:1.15; letter-spacing:-.025em; }
+.travel-selected p { margin:0 0 4px; font-size:13px; color:var(--travel-muted); }
+.travel-coordinate { margin:20px 0 0; font-variant-numeric:tabular-nums; font-size:16px; }
+.travel-coordinate-note { margin:4px 0 20px; font-size:13px; color:var(--travel-muted); }
+.travel-mini-map svg { display:block; width:100%; height:auto; }
+.travel-legend { display:flex; flex-wrap:wrap; gap:18px; margin:12px 0 24px; font-size:13px; color:var(--travel-muted); }
+.travel-legend span { display:flex; gap:6px; align-items:center; }
+.travel-legend i { width:10px; height:10px; background:var(--map-land); }
+.travel-legend .visited { background:var(--map-visited); }
+.travel-legend .selected { background:var(--map-selected); }
+.travel-country-note > p { max-width:44ch; }
+.travel-country-note > a { color:#b6c7a3; display:inline-flex; align-items:center; font-size:14px; }
+.travel-next { background:#39471f; color:#f2eee4; padding:24px 0; margin-top:20px; overflow:hidden; }
+.travel-next-heading { display:flex; justify-content:space-between; align-items:center; padding:0 4% 22px; }
+.travel-next h2 { font-size:28px; font-weight:450; letter-spacing:-.025em; margin:0; }
+.travel-next p { margin:4px 0 0; font-size:16px; }
+.travel-next button { background:#f2eee4; color:#39471f; }
+.travel-next-window { overflow:hidden; margin-inline:4%; }
+.travel-next-track { display:flex; width:max-content; animation:flags-travel 100s linear infinite; }
+.travel-next-track[data-running=false],.travel-next-window:hover .travel-next-track { animation-play-state:paused; }
+.travel-next ul { display:flex; gap:32px; align-items:center; list-style:none; padding:0 32px 0 0; margin:0; }
+.travel-next li { display:flex; gap:10px; align-items:center; white-space:nowrap; font-size:16px; }
+.travel-next li img { object-fit:contain; }
+@keyframes flags-travel { to { transform:translateX(-50%); } }
+.travel-footer { padding:24px 4% 32px; }
+.travel-footer summary { min-height:44px; cursor:pointer; align-content:center; font-size:14px; color:var(--travel-muted); }
+.travel-footer p { max-width:70ch; font-size:16px; color:var(--travel-muted); }
+.travel-footer p a { text-decoration:underline; text-underline-offset:3px; font-size:inherit; }
+.travel-back { display:inline-flex; align-items:center; margin-top:12px; font-size:14px!important; }
+@media(max-width:1000px) { .travel-intro { align-items:flex-start; gap:20px; }.travel-progress { display:block; }.travel-progress strong { display:block; }.travel-progress a { margin-top:4px; }.travel-globe-layout { grid-template-columns:1.25fr 1fr; gap:24px; } }
+@media(max-width:700px) { .travel-header { padding:8px 5%; }.travel-header nav a:first-child { display:none; }.travel-intro { flex-direction:column; padding:20px 5%; gap:18px; }.travel-intro h1 { font-size:36px; }.travel-progress { display:grid; grid-template-columns:auto auto; column-gap:12px; }.travel-progress strong { font-size:38px; }.travel-progress a { grid-column:auto; margin:0; }.travel-progress span { grid-column:2; }.travel-progress p { grid-column:2; }.travel-explorer { padding-inline:5%; }.travel-list-heading { display:block; }.travel-list-heading span { display:block; margin-top:4px; }.travel-countries { gap:5px; }.travel-countries button { padding:6px 8px; }.travel-globe-layout { display:block; }.travel-globe { height:390px; }.travel-country-note { padding-top:12px; }.travel-next-heading { gap:12px; padding-inline:5%; }.travel-next-heading button { flex:none; }.travel-next h2 { font-size:24px; }.travel-footer { padding-inline:5%; } }
+@media(prefers-reduced-motion:reduce) { .travel-atlas * { animation:none!important; transition:none!important; }.travel-next ul[aria-hidden=true] { display:none; }.travel-next-window { overflow-x:auto; padding-inline:5%; }.travel-next-track { transform:none; } }
+
+.travel-list-toggle { display:none; }
+@media(max-width:700px) {
+  .travel-countries:not([data-expanded=true]) button:nth-child(n+7):not([aria-pressed=true]) { display:none; }
+  .travel-list-toggle { display:flex; align-items:center; margin-top:4px; padding:0; color:var(--travel-olive); font-size:13px!important; background:none; }
+}
+
+@media(max-width:700px) { .travel-next-window { margin-inline:5%; } }
+
+.travel-country-note > a { display:flex; justify-content:flex-start; gap:0; }
+@media(max-width:700px) { .travel-header { flex-wrap:wrap; gap:0 12px; }.travel-header nav { flex-wrap:wrap; gap:0 16px; }.travel-header nav a { font-size:13px; }.travel-header nav a:first-child { display:inline-flex; } }

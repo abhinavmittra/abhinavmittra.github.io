@@ -1,0 +1,82 @@
+@import "tailwindcss";
+@theme {
+  --font-sans:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+}
+:root {
+  --bg: #111719;
+  --panel: #202a2b;
+  --text: #eeeede;
+  --muted: #afbab5;
+  --accent: #b5bce8;
+  --sans: var(--font-sans);
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+button {
+  cursor: pointer;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button {
+  color: inherit;
+}
+button:disabled {
+  cursor: default;
+}
+[hidden] {
+  display: none !important;
+}
+/* Local MIT-licensed Bootstrap SVGs identify link destinations. */
+a:is([target="_blank"], [href^="mailto:"])::before {
+  content: "";
+  display: inline-block;
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+  margin-inline-end: 7px;
+  vertical-align: -4px;
+  background: currentColor;
+  mask: var(--destination-icon, var(--icon-external)) center/contain no-repeat;
+}
+a[href*="youtube.com"] {
+  --destination-icon: var(--icon-youtube);
+}
+a[href*="instagram.com"] {
+  --destination-icon: var(--icon-instagram);
+}
+a[href*="linkedin.com"] {
+  --destination-icon: var(--icon-linkedin);
+}
+a[href*="github.com"] {
+  --destination-icon: var(--icon-github);
+}
+a[href*="wa.me"] {
+  --destination-icon: var(--icon-whatsapp);
+}
+a[href^="mailto:"] {
+  --destination-icon: var(--icon-envelope);
+}
+a[href$=".pdf"] {
+  --destination-icon: var(--icon-resume);
+}
