@@ -57,27 +57,26 @@ a:is([target="_blank"], [href^="mailto:"])::before {
   margin-inline-end: 7px;
   vertical-align: -4px;
   background: currentColor;
-  mask: var(--destination-icon, url("/icons/box-arrow-up-right.svg"))
-    center/contain no-repeat;
+  mask: var(--destination-icon, var(--icon-external)) center/contain no-repeat;
 }
 a[href*="youtube.com"] {
-  --destination-icon: url("/icons/youtube.svg");
+  --destination-icon: var(--icon-youtube);
 }
 a[href*="instagram.com"] {
-  --destination-icon: url("/icons/instagram.svg");
+  --destination-icon: var(--icon-instagram);
 }
 a[href*="linkedin.com"] {
-  --destination-icon: url("/icons/linkedin.svg");
+  --destination-icon: var(--icon-linkedin);
 }
 a[href*="github.com"] {
-  --destination-icon: url("/icons/github.svg");
+  --destination-icon: var(--icon-github);
 }
 a[href*="wa.me"] {
-  --destination-icon: url("/icons/whatsapp.svg");
+  --destination-icon: var(--icon-whatsapp);
 }
 a[href^="mailto:"] {
-  --destination-icon: url("/icons/envelope.svg");
+  --destination-icon: var(--icon-envelope);
 }
 a[href$=".pdf"] {
-  --destination-icon: url("/icons/file-earmark-text.svg");
+  --destination-icon: var(--icon-resume);
 }

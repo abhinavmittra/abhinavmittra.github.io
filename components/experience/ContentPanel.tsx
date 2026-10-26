@@ -17,6 +17,7 @@ import {
 } from "@/content/portfolio";
 import { roadmap } from "@/content/roadmap";
 import { mailDraft } from "./performance";
+import { sitePath } from "@/lib/sitePath";
 import type { Panel } from "./types";
 import { AppearancePanel, type AppearanceProps } from "./AppearancePanel";
 
@@ -261,7 +262,7 @@ function ProjectDetail({
         <a
           className="text-link"
           key={link.href}
-          href={link.href}
+          href={sitePath(link.href)}
           target={link.href.startsWith("https:") ? "_blank" : undefined}
           rel="noopener noreferrer"
         >
@@ -333,8 +334,8 @@ export function ContentPanel({
           </div>
         </section>
         <div className="flex flex-wrap gap-4">
-          <a href="/travel/">Explore all 29 countries ↗</a>
-          <a href="/resume.pdf" target="_blank" rel="noopener noreferrer">
+          <a href={sitePath("/travel/")}>Explore all 29 countries ↗</a>
+          <a href={sitePath("/resume.pdf")} target="_blank" rel="noopener noreferrer">
             Resume
           </a>
         </div>
@@ -409,7 +410,7 @@ export function ContentPanel({
           </a>
           <a
             className="action"
-            href="/resume.pdf"
+            href={sitePath("/resume.pdf")}
             target="_blank"
             rel="noopener noreferrer"
           >

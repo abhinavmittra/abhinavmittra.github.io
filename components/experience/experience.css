@@ -94,7 +94,7 @@
   width: 16px;
   height: 16px;
   background: currentColor;
-  mask: url("/icons/envelope.svg") center/contain no-repeat;
+  mask: var(--icon-envelope) center/contain no-repeat;
 }
 .experience-header nav {
   display: flex;

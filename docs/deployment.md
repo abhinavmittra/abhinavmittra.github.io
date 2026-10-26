@@ -10,12 +10,24 @@ updated: 2026-10-27
 
 # Deployment
 
-Next.js builds static HTML, CSS and JavaScript into `out/`. The WebGL scenes run in visitors’ browsers, and feedback opens a local email draft. No server is required by the current routes. GitHub Pages can serve the export from a user site or custom domain.
+## URL and folders
 
-GitHub Pages restricts sites primarily used to run an online business or facilitate commercial transactions. If A•WAKE becomes an active storefront, review the [Pages usage policy](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits) and host commerce separately as appropriate. The current catalogue links to an external WhatsApp order handoff.
+The GitHub repository is `abhinavmittra.github.io`, which makes it a user site served at `https://abhinavmittra.github.io/`. The site uses the domain root; there is no repository-name prefix in its routes. The repository name is separate from the build output folder.
 
-The app uses root-relative URLs. A project site hosted under `/repository-name/` needs a configured `basePath` plus checks for image, CSS, fetch and navigation paths. For a user site or custom domain, the root path is simpler. Check direct refreshes for `/`, `/cold-brew/` and `/travel/` on the chosen Pages setup before publishing.
+`npm run build` writes the static site to `out/`. `.next/` contains Next.js build and cache files. Both are generated and ignored by Git; only `out/` is uploaded to Pages. The WebGL scenes run in visitors’ browsers, and feedback opens a local email draft, so current routes need no application server.
 
-This repository has a check-and-build workflow, not a publishing workflow. To deploy, configure GitHub Pages with a GitHub Actions workflow that uploads the `out/` directory after `npm ci`, `npm run check` and `npm run build`.
+The Pages workflow builds with no `basePath`, matching the user-site domain root. `sitePath()` supports a prefix if the app is later hosted under a project path; no prefix is set for this deployment. `trailingSlash: true` exports routes such as `/travel/index.html`, so direct route loads map to directory index files. The Pages build can be previewed with the regular `npm run preview` command.
+
+## GitHub Actions setup
+
+The workflow at `.github/workflows/pages.yml` runs checks and a static build for pull requests, and publishes on pushes to `main` or `migration/nextjs-typescript`. It uploads only `out/` as the Pages artifact. To enable publishing, open repository **Settings → Pages** and choose **GitHub Actions** as the build and deployment source. No deploy token or secret is needed.
+
+After merging the current branch into `main`, the `main` trigger keeps publishing from the default branch. The migration branch trigger is included so the current app can be published while the migration branch is active; remove that trigger after the branch is retired if desired.
+
+## Custom domain and A•WAKE
+
+A custom domain can replace the GitHub URL later. Configure it in repository settings and DNS; it can continue serving the site from the domain root without a `basePath`.
+
+The coffee catalogue links to an external WhatsApp order handoff. GitHub Pages restricts sites primarily used to run an online business or facilitate commercial transactions; review the [Pages usage policy](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits) if A•WAKE becomes an active storefront.
 
 Sources: [Next.js static exports](https://nextjs.org/docs/app/guides/static-exports), [GitHub Pages limits and policy](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits), [GitHub Pages custom workflows](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages).

@@ -11,7 +11,7 @@ npm ci
 npm run dev
 ```
 
-Open http://127.0.0.1:4173. `npm run check` runs the project checks, `npm run build` creates the static export in `out/`, and `npm run preview` serves that export at http://127.0.0.1:4174.
+Open http://127.0.0.1:4173. `npm run check` runs the project checks. `npm run build` creates the static website in `out/`; `npm run preview` serves that output at http://127.0.0.1:4174. The `.next/` directory is Next.js build/cache data. Only `out/` is published. Both directories are generated locally and ignored by Git.
 
 ## Routes
 
@@ -33,8 +33,14 @@ Open http://127.0.0.1:4173. `npm run check` runs the project checks, `npm run bu
 
 Edit content in `content/` and preserve one canonical record per project. The work proposals are not claims of shipped features. Fictional workflows are labelled in the project stories.
 
-## Contributing and deployment
+## GitHub Pages
 
-See [Contributing](CONTRIBUTING.md), the [documentation index](docs/index.md), and [deployment notes](docs/deployment.md). The app builds as a static export; GitHub Pages can serve it from a user site or custom domain.
+The repository is `abhinavmittra.github.io`, so the site is served at <https://abhinavmittra.github.io/>. Pushes to `main` or `migration/nextjs-typescript` run the check, build the static export, and deploy it through GitHub Actions. Pull requests run checks and build but do not publish.
+
+In the repository, open **Settings → Pages** and set the build and deployment source to **GitHub Actions**. The published artifact is the generated `out/` directory; do not commit that directory. See [deployment notes](docs/deployment.md) for URL and build details.
+
+## Contributing
+
+See [Contributing](CONTRIBUTING.md) and the [documentation index](docs/index.md).
 
 The project code is MIT licensed. The A•WAKE artwork, personal résumé and third-party assets have separate terms described in [NOTICE](NOTICE.md).

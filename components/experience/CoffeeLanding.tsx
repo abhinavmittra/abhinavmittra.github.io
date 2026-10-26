@@ -1,5 +1,6 @@
 import { AwakeLogo } from "@/components/cold-brew/AwakeLogo";
 import { coldBrew } from "@/content/cold-brew";
+import { sitePath } from "@/lib/sitePath";
 export function CoffeeLanding() {
   return (
     <section className="coffee-portal-content" aria-labelledby="portal-title">
@@ -7,7 +8,7 @@ export function CoffeeLanding() {
         <div className="portal-logo">
           <AwakeLogo />
         </div>
-        <a className="text-link" href="/cold-brew/">
+        <a className="text-link" href={sitePath("/cold-brew/")}>
           Full brew studio ↗
         </a>
       </div>
@@ -24,7 +25,7 @@ export function CoffeeLanding() {
         {coldBrew.flavours.map((flavour) => (
           <a
             key={flavour.key}
-            href={`/cold-brew/?flavour=${flavour.key}`}
+            href={sitePath(`/cold-brew/?flavour=${flavour.key}`)}
             className="portal-flavour"
             style={{ "--item-color": flavour.color } as React.CSSProperties}
           >
@@ -35,7 +36,7 @@ export function CoffeeLanding() {
           </a>
         ))}
       </div>
-      <a className="action primary-action" href="/cold-brew/">
+      <a className="action primary-action" href={sitePath("/cold-brew/")}>
         Explore A•WAKE ↗
       </a>
     </section>

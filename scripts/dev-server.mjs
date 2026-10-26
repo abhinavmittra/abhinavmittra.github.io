@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('../out/', import.meta.url));
 const port = Number(process.env.PORT || 4174);
 const host = process.env.HOST || '127.0.0.1';
+const basePath = (process.env.NEXT_PUBLIC_BASE_PATH || '').replace(/\/$/, '');
 const mime = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8',
@@ -23,7 +24,12 @@ const server = createServer(async (req, res) => {
     res.writeHead(405, { Allow: 'GET, HEAD' }); res.end(); return;
   }
   try {
-    const requested = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
+    let requested = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
+    if (basePath) {
+      if (requested === basePath || requested === `${basePath}/`) requested = '/';
+      else if (requested.startsWith(`${basePath}/`)) requested = requested.slice(basePath.length);
+      else { res.writeHead(404); res.end('Not found'); return; }
+    }
     let target = resolve(root, `.${requested === '/' ? '/index.html' : requested}`);
     if (target !== resolve(root) && !target.startsWith(resolve(root) + sep)) {
       res.writeHead(403); res.end('Forbidden'); return;
@@ -53,7 +59,7 @@ const server = createServer(async (req, res) => {
     res.writeHead(500); res.end('Internal server error');
   }
 });
-server.listen(port, host, () => console.log(`Static export preview: http://${host}:${port}\nRun npm run build to refresh it. Ctrl+C stops the server.`));
+server.listen(port, host, () => console.log(`Static export preview: http://${host}:${port}${basePath || '/'}\nRun npm run build to refresh it. Ctrl+C stops the server.`));
 server.on('error', error => {
   console.error(error.code === 'EADDRINUSE' ? `Port ${port} is in use. Stop the existing server or set PORT.` : error.message);
   process.exitCode = 1;

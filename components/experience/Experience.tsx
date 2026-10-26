@@ -22,6 +22,7 @@ import { usePreferences } from "./usePreferences";
 import type { Panel, Quality, SceneCommand } from "./types";
 import "./experience.css";
 import { accentText, defaultLook, type DeskLook } from "./preferences";
+import { sitePath } from "@/lib/sitePath";
 const AdaptiveScene = dynamic(() => import("./AdaptiveScene"), {
   ssr: false,
   loading: () => (
@@ -204,7 +205,7 @@ export function Experience() {
         lamp ? interfaceCopy.lampOffQuote : interfaceCopy.lampOnQuote,
       );
     } else if (["travel", "globe", "countries"].includes(value))
-      window.location.assign("/travel/");
+      window.location.assign(sitePath("/travel/"));
     else if (["clock", "time"].includes(value)) {
       if (!minimal) navigate("clock");
       setAnnouncement(
@@ -299,7 +300,7 @@ export function Experience() {
             <span>
               <strong>6+</strong> years at Cisco
             </span>
-            <a href="/travel/">
+            <a href={sitePath("/travel/")}>
               <strong>29</strong> countries visited ↗
             </a>
           </div>
@@ -530,8 +531,8 @@ export function Experience() {
       <noscript>
         <p className="noscript-note">
           The case studies above are available without 3D. For the full written
-          background, <a href="/resume.pdf">read the résumé</a>,{" "}
-          <a href="/cold-brew/">visit A•WAKE</a> or{" "}
+          background, <a href={sitePath("/resume.pdf")}>read the résumé</a>,{" "}
+          <a href={sitePath("/cold-brew/")}>visit A•WAKE</a> or{" "}
           <a href={`mailto:${profile.email}`}>email Abhinav</a>.
         </p>
       </noscript>

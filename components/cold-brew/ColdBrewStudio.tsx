@@ -8,6 +8,7 @@ import { CoffeeMomentScene } from './CoffeeMomentScene';
 import { CoffeeProfiles } from './CoffeeProfiles';
 import { profile } from '@/content/portfolio';
 import { AwakeLogo } from './AwakeLogo';
+import { sitePath } from '@/lib/sitePath';
 
 export function ColdBrewStudio() {
   const [selected,setSelected]=useState<BrewFlavour>('classic');
@@ -45,7 +46,7 @@ export function ColdBrewStudio() {
   return (
     <main className="brew-studio">
       <header className="brew-header">
-        <a className="brew-home" href="/">← Systems Desk</a>
+        <a className="brew-home" href={sitePath('/')}>← Systems Desk</a>
         <nav aria-label="Coffee guide"><a href="#bean-explorer">Beans & roasting</a><a href="#coffee-moments">Find your moment</a><a href="#behind-brew">Meet Abhinav</a></nav>
       </header>
       <div className="brew-layout">
@@ -94,7 +95,7 @@ export function ColdBrewStudio() {
           <section className="brew-process" aria-labelledby="process-title"><h2 id="process-title">From cherry to glass.</h2><ol>{coffeeProcess.map(item=><li key={item.name}><h3>{item.name}</h3><p>{item.body}</p></li>)}</ol>{readingLink('process')}<p className="brew-note">Cold brew extracts in cool water. Iced coffee can be brewed hot and then chilled. They may arrive at the same temperature by different routes.</p>{readingLink('cold')}</section>
           <section className="brew-moments" id="coffee-moments" aria-labelledby="moments-title"><h2 id="moments-title">Make a little time.</h2><div className="brew-moment-options" aria-label="Choose a coffee occasion">{coffeeMoments.map((item,index)=><button key={item.key} aria-pressed={moment===index} onClick={()=>{setMoment(index);setSelected(item.flavour);}}>{item.title}</button>)}</div><div className="brew-moodboard" data-moment={coffeeMoments[moment].key}><div className="brew-mood-art"><CoffeeMomentScene moment={coffeeMoments[moment].key}/></div><div aria-live="polite"><h3>{coffeeMoments[moment].heading}</h3><p>{coffeeMoments[moment].body}</p><ul>{coffeeMoments[moment].objects.map(object=><li key={object}>{object}</li>)}</ul></div></div><nav aria-label="Choose the coffee for this occasion"><a href="#flavour-title" className="brew-reference">Choose {coldBrew.flavours.find(item=>item.key===coffeeMoments[moment].flavour)?.name} ↑</a></nav></section>
           <section className="brew-facts" aria-labelledby="facts-title"><h2 id="facts-title">A little coffee sense.</h2><details open><summary>A lift, with a limit</summary><p>Caffeine can help with alertness and concentration. It can also disturb sleep or make some people feel anxious. The amount in these bottles has not been measured.</p>{readingLink('roasting')}</details><details><summary>What about health benefits?</summary><p>Studies associate moderate coffee drinking with some health benefits, including a lower risk of type 2 diabetes. An association does not prove that coffee caused the benefit, and it is not a health promise about this brew.</p>{readingLink('roasting')}</details><details><summary>Smooth does not mean caffeine-free</summary><p>Taste cannot tell you the caffeine dose. The FDA cites 400 mg a day as an amount generally not associated with negative effects for most adults; sensitivity and personal circumstances vary.</p>{readingLink('caffeine')}</details><details><summary>Less sour is a tasting note</summary><p>Cold-brew research found differences in perceived sourness and bitterness. That does not establish that every cold brew has a lower pH or is easier on your stomach.</p>{readingLink('cold')}</details></section>
-          <section className="brew-about" id="behind-brew" aria-labelledby="about-brew-title"><h2 id="about-brew-title">{coldBrew.aboutTitle}</h2><p>{coldBrew.about}</p><a href={profile.instagram} target="_blank" rel="noopener noreferrer">Backpacking Abi on Instagram</a><a href={profile.youtube} target="_blank" rel="noopener noreferrer">Backpacking Abi on YouTube</a><a href="/travel/">See all 29 countries on the globe ↗</a><br/><a href="/#workbench">Back to the rest of my work ↗</a></section>
+          <section className="brew-about" id="behind-brew" aria-labelledby="about-brew-title"><h2 id="about-brew-title">{coldBrew.aboutTitle}</h2><p>{coldBrew.about}</p><a href={profile.instagram} target="_blank" rel="noopener noreferrer">Backpacking Abi on Instagram</a><a href={profile.youtube} target="_blank" rel="noopener noreferrer">Backpacking Abi on YouTube</a><a href={sitePath('/travel/')}>See all 29 countries on the globe ↗</a><br/><a href={sitePath('/#workbench')}>Back to the rest of my work ↗</a></section>
         </div>
       </div>
     </main>
