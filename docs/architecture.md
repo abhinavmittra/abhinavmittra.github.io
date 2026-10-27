@@ -37,3 +37,11 @@ Projected labels are regular DOM buttons and links outside Canvas. Project detai
 At phone and tablet widths (800px and below), projected cards and connector calculations are replaced by a compact story dock. Selecting a project focuses its model and puts the tour text in the page below the scene. The coffee transition uses the same fixed canvas area and a flowing catalogue panel. Scrolling waits for panel content to commit, and motion controls are available in a native disclosure. Mobile rendering keeps antialiasing, caps pixel ratio at 1.75 and skips projected-label collision work.
 
 Sources: [R3F performance](https://r3f.docs.pmnd.rs/advanced/scaling-performance), [Three.js OrbitControls](https://threejs.org/docs/#examples/en/controls/OrbitControls).
+
+## Workspace terminal
+
+`WorkspaceTerminal` searches canonical records through `content/workspace-search.ts` and the text ranker in `lib/workspaceSearch.ts`. The index is tokenized once per module load; searching is local and adds no service or model download. It includes project descriptions and sections, story and notebook entries, planned work, coffee guides and visited countries. Private repository documentation is not indexed.
+
+Exact command aliases preserve desk controls. Other queries rank literal words, prefixes and phrases, with limited typo tolerance on titles and keywords. Every meaningful query term must match; results are grouped by destination to avoid repeated project panels. React renders excerpts as text. Enter or a pointer selection activates an explicit panel, route or command target; arbitrary input never executes code or becomes a regular expression.
+
+The input follows the [WAI-ARIA combobox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/): arrows select, Enter opens, Escape closes, and Cmd/Ctrl K focuses search outside a modal. `help` lists actions; `clear` clears the transient terminal output. Panel results focus the matching heading. Coffee routes accept validated `flavour`, `roast`, `species`, `origin`, `moment` and `fact` selections; travel accepts a validated visited-country `country` code. These URL selections work with the static GitHub Pages export.

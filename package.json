@@ -20,7 +20,7 @@
     "dev": "next dev --hostname 127.0.0.1 --port 4173",
     "build": "next build",
     "preview": "node scripts/dev-server.mjs out",
-    "check": "tsc --noEmit && node --check components/cold-brew/brewScene.js && node --check components/travel/travelGlobe.js && node --check scripts/dev-server.mjs && node scripts/test-travel-geography.mjs && node scripts/test-map-colours.mjs && node scripts/test-brew-motion.mjs && node scripts/test-clock.mjs && node scripts/test-frame-timer.mjs && node scripts/test-station-labels.mjs && node --experimental-strip-types scripts/test-experience.mts && node scripts/check-docs.mjs && node scripts/audit-assets.mjs",
+    "check": "tsc --noEmit && node --check components/cold-brew/brewScene.js && node --check components/travel/travelGlobe.js && node --check scripts/dev-server.mjs && node scripts/test-travel-geography.mjs && node scripts/test-map-colours.mjs && node scripts/test-brew-motion.mjs && node scripts/test-clock.mjs && node scripts/test-frame-timer.mjs && node scripts/test-station-labels.mjs && node --experimental-strip-types scripts/test-experience.mts && node --experimental-strip-types scripts/test-workspace-search.mts && node scripts/check-docs.mjs && node scripts/audit-assets.mjs",
     "audit:assets": "node scripts/audit-assets.mjs"
   },
   "devDependencies": {

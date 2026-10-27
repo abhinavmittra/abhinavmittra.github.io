@@ -21,6 +21,13 @@ export function TravelAtlas(){
   const selection=useRef(selected),turning=useRef(spin);selection.current=selected;turning.current=spin;
   const country=visitedCountries.find(c=>c.code===selected)||visitedCountries[0];
   useEffect(()=>{
+    const requested=new URLSearchParams(window.location.search).get('country');
+    if(visitedCountries.some(item=>item.code===requested)) {
+      selection.current=requested!;turning.current=false;
+      setSelected(requested!);setSpin(false);setExpanded(true);
+    }
+  },[]);
+  useEffect(()=>{
     const abort=new AbortController();const media=matchMedia('(prefers-reduced-motion: reduce)');setGentle(media.matches);
     const motion=(e:MediaQueryListEvent)=>setGentle(e.matches);media.addEventListener('change',motion);
     setFailed(false);setStatus('Loading the map…');

@@ -239,31 +239,6 @@
   color: var(--exp-muted);
   flex: none;
 }
-.workbench-toolbar form {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  flex: 1;
-  min-width: 0;
-  border-radius: 9px;
-  background: var(--exp-panel);
-  padding: 0 10px;
-  min-height: 44px;
-  border: 1px solid var(--exp-line);
-}
-.workbench-toolbar form > span {
-  color: var(--exp-accent);
-}
-.workbench-toolbar input {
-  min-width: 0;
-  flex: 1;
-  background: none;
-  outline-offset: 0;
-}
-.workbench-toolbar form button {
-  min-width: 30px;
-  min-height: 40px;
-}
 .scene-stage {
   position: relative;
   height: calc(100dvh - 162px);

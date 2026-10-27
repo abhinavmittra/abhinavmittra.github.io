@@ -288,6 +288,7 @@ function ProjectDetail({
 }
 export function ContentPanel({
   panel,
+  searchHeading,
   onClose,
   onOpen,
   atmosphere,
@@ -300,6 +301,7 @@ export function ContentPanel({
   onReplay,
 }: {
   panel: Panel;
+  searchHeading?: string;
   onClose: () => void;
   onOpen: (panel: Panel) => void;
 } & AppearanceProps) {
@@ -315,6 +317,26 @@ export function ContentPanel({
       previous?.focus({ preventScroll: true });
     };
   }, [panel]);
+  useEffect(() => {
+    if (!panel || !searchHeading) return;
+    const element = dialog.current;
+    const heading = Array.from(element?.querySelectorAll<HTMLElement>('h3, h4, summary strong') || [])
+      .find(node => node.textContent?.trim() === searchHeading);
+    if (!heading) return;
+    const details = heading.closest('details');
+    if (details) details.open = true;
+    const section = heading.closest('section, article, details');
+    section?.setAttribute('data-search-hit', 'true');
+    const previousTabIndex = heading.getAttribute('tabindex');
+    heading.tabIndex = -1;
+    heading.focus({ preventScroll: true });
+    heading.scrollIntoView({ block: 'start', behavior: 'instant' });
+    return () => {
+      section?.removeAttribute('data-search-hit');
+      if (previousTabIndex === null) heading.removeAttribute('tabindex');
+      else heading.setAttribute('tabindex', previousTabIndex);
+    };
+  }, [panel, searchHeading]);
   if (!panel) return null;
   let title: string;
   let content: ReactNode;

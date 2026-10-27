@@ -1,11 +1,16 @@
 'use client';
 
-import { useState, type CSSProperties } from 'react';
+import { useState, useEffect, type CSSProperties } from 'react';
 import { indianCoffeeProfiles } from '@/content/cold-brew';
 
 /** An origin field guide, kept separate from the roast and flavour selectors. */
 export function CoffeeProfiles() {
   const [selected, setSelected] = useState(0);
+  useEffect(() => {
+    const requested=new URLSearchParams(window.location.search).get('origin');
+    const index=indianCoffeeProfiles.findIndex(item=>item.key===requested);
+    if(index>=0)setSelected(index);
+  }, []);
   const coffee = indianCoffeeProfiles[selected];
   return <div className="brew-origins">
     <h3>Three Indian coffee profiles</h3>

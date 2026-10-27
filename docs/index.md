@@ -10,6 +10,6 @@ okf_version: "0.2"
 - [Deployment](deployment.md): static export and GitHub Pages setup.
 - [A•WAKE identity](awake/): source artwork, palette and packaging.
 - [Travel provenance](travel/): boundaries, coordinates, flags and counting.
-- [Writing and research](copy/): portfolio facts and practical AI learning resources.
+- [Writing guidance](copy/): canonical portfolio copy and factual boundaries.
 
 Start with the [README](../README.md) and [contribution guide](../CONTRIBUTING.md).

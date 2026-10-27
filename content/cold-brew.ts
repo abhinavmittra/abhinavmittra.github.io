@@ -52,6 +52,12 @@ export const coffeeMoments = [
   {key:'afternoon',title:'An afternoon pause',flavour:'cinnamon' as BrewFlavour,heading:'Put the laptop aside.',body:'Fresh Cinnamon, a little ice, and ten minutes away from the screen. Warm spice, served cold.',colors:['#ac885e','#e2d4b9','#4d583f'],objects:['Cinnamon bark','A shaded table','A quiet corner']},
   {key:'company',title:'A table for two',flavour:'anise' as BrewFlavour,heading:'Something to talk over.',body:'Pour Star Anise into two small glasses and compare it with Classic. Start with the aroma; see what each of you notices.',colors:['#4b352a','#b9ac81','#c8b19a'],objects:['Star-shaped spice','Two small glasses','A longer conversation']}
 ] as const;
+export const coffeeFacts = [
+  {key:'alertness',title:'A lift, with a limit',body:'Caffeine can help with alertness and concentration. It can also disturb sleep or make some people feel anxious. The amount in these bottles has not been measured.',source:'roasting'},
+  {key:'benefits',title:'What about health benefits?',body:'Studies associate moderate coffee drinking with some health benefits, including a lower risk of type 2 diabetes. An association does not prove that coffee caused the benefit, and it is not a health promise about this brew.',source:'roasting'},
+  {key:'caffeine',title:'Smooth does not mean caffeine-free',body:'Taste cannot tell you the caffeine dose. The FDA cites 400 mg a day as an amount generally not associated with negative effects for most adults; sensitivity and personal circumstances vary.',source:'caffeine'},
+  {key:'acidity',title:'Less sour is a tasting note',body:'Cold-brew research found differences in perceived sourness and bitterness. That does not establish that every cold brew has a lower pH or is easier on your stomach.',source:'cold'},
+] as const;
 export const coffeeReading = {
   species:{label:'World Coffee Research · species & varieties',href:'https://varieties.worldcoffeeresearch.org/about-the-catalog/whats-included'},
   roasting:{label:'Harvard Nutrition Source · coffee',href:'https://nutritionsource.hsph.harvard.edu/food-features/coffee/'},

@@ -5,7 +5,6 @@ import {
   useEffect,
   useRef,
   useState,
-  type FormEvent,
 } from "react";
 import {
   profile,
@@ -16,6 +15,8 @@ import {
   type ProjectKey,
   type StationKey,
 } from "@/content/portfolio";
+import { WorkspaceTerminal } from "./WorkspaceTerminal";
+import type { WorkspaceTarget, WorkspaceCommand } from "@/content/workspace-search";
 import { ContentPanel } from "./ContentPanel";
 import { MinimalView } from "./MinimalView";
 import { CoffeeLanding } from "./CoffeeLanding";
@@ -60,15 +61,14 @@ export function Experience() {
   const [command, setCommand] = useState<SceneCommand>({
       id: 0,
       target: "overview",
-    }),
-    [input, setInput] = useState("");
+    });
+  const [searchHeading, setSearchHeading] = useState<string>();
   useEffect(() => {
     if (!announcement) return;
     const timer = setTimeout(() => setAnnouncement(""), 6000);
     return () => clearTimeout(timer);
   }, [announcement]);
   const coffeeRef = useRef<HTMLDivElement>(null),
-    inputRef = useRef<HTMLInputElement>(null),
     sceneRef = useRef<HTMLElement>(null);
   useEffect(() => {
     const media = matchMedia('(max-width: 800px)');
@@ -96,16 +96,6 @@ export function Experience() {
     });
     return () => cancelAnimationFrame(frame);
   }, [compact, tour, coffee]);
-  useEffect(() => {
-    const shortcut = (event: KeyboardEvent) => {
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
-        event.preventDefault();
-        inputRef.current?.focus();
-      }
-    };
-    window.addEventListener("keydown", shortcut);
-    return () => window.removeEventListener("keydown", shortcut);
-  }, []);
   const navigate = useCallback(
     (target: SceneCommand["target"]) =>
       setCommand((value) => ({ id: value.id + 1, target })),
@@ -113,6 +103,7 @@ export function Experience() {
   );
   const open = useCallback(
     (next: Panel) => {
+      setSearchHeading(undefined);
       setPanel(next);
       if (next && keys.includes(next as StationKey))
         navigate(next as StationKey);
@@ -199,64 +190,47 @@ export function Experience() {
     setTour(index);
     navigate(keys[index]);
   }
-  function terminal(event: FormEvent) {
-    event.preventDefault();
-    const value = input.trim().toLowerCase().split(/\s+/)[0];
-    setInput("");
-    const panels: Record<string, Panel> = {
-      story: "story",
-      journey: "story",
-      about: "story",
-      evals: "notebook",
-      notebook: "notebook",
-      ai: "notebook",
-      roadmap: "roadmap",
-      next: "roadmap",
-      contact: "contact",
-      settings: "settings",
-      customize: "settings",
-      cisco: "discovery",
-      agents: "incident",
-      inference: "integrations",
-      field: "fieldnotes",
-      fieldnotes: "fieldnotes",
-    };
-    if (panels[value]) open(panels[value]);
-    else if (["brew", "coffee", "awake", "coldbrew"].includes(value))
-      coffeeBreak();
-    else if (["reset", "home", "overview", "work"].includes(value)) {
-      setCoffee(false);
-      setTour(-1);
-      navigate("overview");
-    } else if (["tour", "explore"].includes(value)) {
-      if (minimal) open(keys[0]);
-      else tourStep(0);
-    } else if (value === "flow") setFlow(!flow);
-    else if (["explode", "layers"].includes(value)) setExplode(!explode);
-    else if (value === "orbit") setOrbit(!orbit);
-    else if (value === "pause") setMotion(false);
-    else if (value === "resume") setMotion(true);
-    else if (value === "lamp") {
-      setLamp(!lamp);
-      setAnnouncement(
-        lamp ? interfaceCopy.lampOffQuote : interfaceCopy.lampOnQuote,
-      );
-    } else if (["travel", "globe", "countries"].includes(value))
-      window.location.assign(sitePath("/travel/"));
-    else if (["clock", "time"].includes(value)) {
-      if (!minimal) navigate("clock");
-      setAnnouncement(
-        new Intl.DateTimeFormat(undefined, { timeStyle: "long" }).format(
-          new Date(),
-        ),
-      );
-    } else if (["arrival", "replay"].includes(value)) {
-      replayArrival();
-    } else
-      setAnnouncement(
-        "Try cisco, agents, inference, story, notebook, next, coffee, travel, lamp, pause or resume.",
-      );
+  function selectTerminalResult(target: WorkspaceTarget) {
+    if (target.kind === "page") window.location.assign(sitePath(target.href));
+    else if (target.kind === "panel") {
+      open(target.panel);
+      setSearchHeading(target.heading);
+    } else runTerminalCommand(target.command);
   }
+  function runTerminalCommand(value: WorkspaceCommand) {
+    switch (value) {
+      case "brew": coffeeBreak(); break;
+      case "tour":
+        if (minimal) open(keys[0]);
+        else tourStep(0);
+        break;
+      case "reset":
+        setPanel(null);
+        setCoffee(false);
+        setTour(-1);
+        navigate("overview");
+        break;
+      case "flow": setFlow(!flow); break;
+      case "explode": setExplode(!explode); break;
+      case "orbit": setOrbit(!orbit); break;
+      case "pause": setMotion(false); break;
+      case "resume": setMotion(true); break;
+      case "lamp":
+        setLamp(!lamp);
+        setAnnouncement(lamp ? interfaceCopy.lampOffQuote : interfaceCopy.lampOnQuote);
+        break;
+      case "travel": window.location.assign(sitePath("/travel/")); break;
+      case "clock":
+        setTour(-1);
+        setCoffee(false);
+        scrollToScene();
+        if (!minimal) navigate("clock");
+        setAnnouncement(new Intl.DateTimeFormat(undefined, { timeStyle: "long" }).format(new Date()));
+        break;
+      case "arrival": replayArrival(); break;
+    }
+  }
+
   return (
     <div
       className="systems-experience"
@@ -427,18 +401,7 @@ export function Experience() {
         <div className="workbench-content">
           <div className="workbench-toolbar">
             <span>{coffee ? "Coffee / A•WAKE" : "Workspace / overview"}</span>
-            <form onSubmit={terminal}>
-              <span aria-hidden="true">abhi://</span>
-              <input
-                ref={inputRef}
-                value={input}
-                onChange={(event) => setInput(event.target.value)}
-                aria-label="Workspace command"
-                placeholder="Try ‘story’, ‘coffee’ or ‘next’"
-                autoComplete="off"
-              />
-              <button aria-label="Run command">↵</button>
-            </form>
+            <WorkspaceTerminal onSelect={selectTerminalResult} />
           </div>
           {minimal ? (
             <>
@@ -589,6 +552,7 @@ export function Experience() {
       </div>
       <ContentPanel
         panel={panel}
+        searchHeading={searchHeading}
         onClose={() => setPanel(null)}
         onOpen={open}
         atmosphere={atmosphere}

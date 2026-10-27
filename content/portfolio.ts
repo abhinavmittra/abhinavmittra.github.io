@@ -451,7 +451,6 @@ export const interfaceCopy = {
   sceneInstructions: 'Drag the desk to rotate it, or use the left and right arrow keys when the scene is focused. Use the plus and minus keys or zoom buttons to zoom. Press Home to reset the view. Use Tab to reach the project stations and Enter to open one. Select the A•WAKE card beside the lamp to toggle its light.',
   journeyNav: 'My story',
   notebookNav: 'AI notebook',
-  commandPlaceholder: "Try 'brew', 'story' or 'clock'",
   loading: 'Putting the desk together…',
   sceneOverview: 'Workspace / overview',
   customTitle: 'Find your angle.',
@@ -466,7 +465,5 @@ export const interfaceCopy = {
   contactAction: 'Say hello ↗',
   clockLabel: 'Your time',
   lampOffQuote: 'Late night? Brew yourself.',
-  lampOnQuote: 'Now that’s a bright roast.',
-  commandHelp: 'Commands: tour · cisco · agents · inference · discovery · incident · integrations · about · story · evals · brew · travel · clock · contact · customize · layers · orbit · flow · pause · resume · arrival · reset',
-  commandUnknown: 'Try brew for the coffee studio, clock for your local time, or story for the background.'
+  lampOnQuote: 'Now that’s a bright roast.'
 };

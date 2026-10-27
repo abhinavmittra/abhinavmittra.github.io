@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { coldBrew, brewOrderUrl, beanSpecies, roastStages, coffeeProcess, coffeeMoments, coffeeReading, type BrewFlavour } from '@/content/cold-brew';
+import { coldBrew, brewOrderUrl, beanSpecies, roastStages, coffeeProcess, coffeeMoments, coffeeFacts, coffeeReading, type BrewFlavour } from '@/content/cold-brew';
 import { createBrewScene } from './brewScene';
 import { BackpackerStep } from './BackpackerStep';
 import { CoffeeMomentScene } from './CoffeeMomentScene';
@@ -15,6 +15,7 @@ export function ColdBrewStudio() {
   const [species,setSpecies]=useState(0);
   const [roast,setRoast]=useState(2);
   const [moment,setMoment]=useState(0);
+  const [fact,setFact]=useState<string>('alertness');
   const [spin,setSpin]=useState(false);
   const [reducedMotion,setReducedMotion]=useState(false);
   const [rendererName,setRendererName]=useState('Preparing the bottle…');
@@ -23,7 +24,16 @@ export function ColdBrewStudio() {
   const flavour=coldBrew.flavours.find(item=>item.key===selected)||coldBrew.flavours[0];
 
   useEffect(()=>{
-    const requested=new URLSearchParams(window.location.search).get('flavour');
+    const params=new URLSearchParams(window.location.search);
+    const requested=params.get('flavour');
+    const requestedMoment=coffeeMoments.findIndex(item=>item.key===params.get('moment'));
+    if(requestedMoment>=0){setMoment(requestedMoment);setSelected(coffeeMoments[requestedMoment].flavour);}
+    const requestedFact=coffeeFacts.find(item=>item.key===params.get('fact'));
+    if(requestedFact)setFact(requestedFact.key);
+    const requestedRoast=roastStages.findIndex(item=>item.key===params.get('roast'));
+    const requestedSpecies=beanSpecies.findIndex(item=>item.key===params.get('species'));
+    if(requestedRoast>=0)setRoast(requestedRoast);
+    if(requestedSpecies>=0)setSpecies(requestedSpecies);
     if(coldBrew.flavours.some(item=>item.key===requested))setSelected(requested as BrewFlavour);
     if(!host.current)return;
     const media=matchMedia('(prefers-reduced-motion: reduce)');
@@ -79,10 +89,10 @@ export function ColdBrewStudio() {
             <h2 id="bean-title">Get to know the bean.</h2>
             <p>A little origin, a little heat. Plenty to taste.</p>
             <CoffeeProfiles/>
-            <div className="brew-species" aria-label="Explore coffee species">{beanSpecies.map((item,index)=><button key={item.key} aria-pressed={species===index} onClick={()=>setSpecies(index)}>{item.name}</button>)}</div>
+            <div className="brew-species" id="coffee-species" aria-label="Explore coffee species">{beanSpecies.map((item,index)=><button key={item.key} aria-pressed={species===index} onClick={()=>setSpecies(index)}>{item.name}</button>)}</div>
             <div className="brew-species-copy" aria-live="polite"><h3>{beanSpecies[species].botanical}</h3><p>{beanSpecies[species].body}</p><p>{beanSpecies[species].detail}</p></div>
             {readingLink('species')}
-            <div className="brew-roast-display" style={{'--roast-color':roastStages[roast].color} as React.CSSProperties} aria-hidden="true"><svg viewBox="0 0 320 190" preserveAspectRatio="xMidYMid meet"><g transform="translate(160 95) rotate(-26)">
+            <div className="brew-roast-display" id="coffee-roasts" style={{'--roast-color':roastStages[roast].color} as React.CSSProperties} aria-hidden="true"><svg viewBox="0 0 320 190" preserveAspectRatio="xMidYMid meet"><g transform="translate(160 95) rotate(-26)">
               <path d="M-91 3C-97-34-65-62-20-63 30-69 83-43 92-10 102 24 67 58 22 63-31 72-84 43-91 3Z" fill="currentColor"/>
               <path d="M-75 9C-65-24-34-44 4-47 31-49 57-36 68-22 32-38-3-33-27-19-48-7-61 8-75 9Z" fill="#fff" opacity=".09"/>
               <path d="M-76 34C-44 13-18 14 8-4 32-22 41-39 70-44 45-29 42-12 18 5-12 25-41 22-76 34Z" fill="#171810" opacity=".66"/>
@@ -94,7 +104,7 @@ export function ColdBrewStudio() {
           </section>
           <section className="brew-process" aria-labelledby="process-title"><h2 id="process-title">From cherry to glass.</h2><ol>{coffeeProcess.map(item=><li key={item.name}><h3>{item.name}</h3><p>{item.body}</p></li>)}</ol>{readingLink('process')}<p className="brew-note">Cold brew extracts in cool water. Iced coffee can be brewed hot and then chilled. They may arrive at the same temperature by different routes.</p>{readingLink('cold')}</section>
           <section className="brew-moments" id="coffee-moments" aria-labelledby="moments-title"><h2 id="moments-title">Make a little time.</h2><div className="brew-moment-options" aria-label="Choose a coffee occasion">{coffeeMoments.map((item,index)=><button key={item.key} aria-pressed={moment===index} onClick={()=>{setMoment(index);setSelected(item.flavour);}}>{item.title}</button>)}</div><div className="brew-moodboard" data-moment={coffeeMoments[moment].key}><div className="brew-mood-art"><CoffeeMomentScene moment={coffeeMoments[moment].key}/></div><div aria-live="polite"><h3>{coffeeMoments[moment].heading}</h3><p>{coffeeMoments[moment].body}</p><ul>{coffeeMoments[moment].objects.map(object=><li key={object}>{object}</li>)}</ul></div></div><nav aria-label="Choose the coffee for this occasion"><a href="#flavour-title" className="brew-reference">Choose {coldBrew.flavours.find(item=>item.key===coffeeMoments[moment].flavour)?.name} ↑</a></nav></section>
-          <section className="brew-facts" aria-labelledby="facts-title"><h2 id="facts-title">A little coffee sense.</h2><details open><summary>A lift, with a limit</summary><p>Caffeine can help with alertness and concentration. It can also disturb sleep or make some people feel anxious. The amount in these bottles has not been measured.</p>{readingLink('roasting')}</details><details><summary>What about health benefits?</summary><p>Studies associate moderate coffee drinking with some health benefits, including a lower risk of type 2 diabetes. An association does not prove that coffee caused the benefit, and it is not a health promise about this brew.</p>{readingLink('roasting')}</details><details><summary>Smooth does not mean caffeine-free</summary><p>Taste cannot tell you the caffeine dose. The FDA cites 400 mg a day as an amount generally not associated with negative effects for most adults; sensitivity and personal circumstances vary.</p>{readingLink('caffeine')}</details><details><summary>Less sour is a tasting note</summary><p>Cold-brew research found differences in perceived sourness and bitterness. That does not establish that every cold brew has a lower pH or is easier on your stomach.</p>{readingLink('cold')}</details></section>
+          <section className="brew-facts" aria-labelledby="facts-title"><h2 id="facts-title">A little coffee sense.</h2>{coffeeFacts.map(item=><details key={item.key} open={fact===item.key}><summary>{item.title}</summary><p>{item.body}</p>{readingLink(item.source)}</details>)}</section>
           <section className="brew-about" id="behind-brew" aria-labelledby="about-brew-title"><h2 id="about-brew-title">{coldBrew.aboutTitle}</h2><p>{coldBrew.about}</p><a href={profile.instagram} target="_blank" rel="noopener noreferrer">Backpacking Abi on Instagram</a><a href={profile.youtube} target="_blank" rel="noopener noreferrer">Backpacking Abi on YouTube</a><a href={sitePath('/travel/')}>See all 29 countries on the globe ↗</a><br/><a href={sitePath('/#workbench')}>Back to the rest of my work ↗</a></section>
         </div>
       </div>
