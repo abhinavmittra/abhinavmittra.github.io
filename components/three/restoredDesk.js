@@ -326,6 +326,7 @@ export function createRestoredDesk(onUpdate) {
     point = new THREE.Vector3(),
     date = new Date();
   let elapsed = 0,
+    packetTime = -1,
     separation = 0,
     arrivalTime = 2;
   const arrivalGroups = [
@@ -365,17 +366,22 @@ export function createRestoredDesk(onUpdate) {
     }
     const lampAnimating = surroundings.update(dt);
     packets.visible = flow;
-    for (let i = 0; i < movingPackets.length; i++) {
-      const packet = movingPackets[i];
-      packet.curve.getPointAt((elapsed * 0.065 + packet.phase) % 1, point);
-      cursor.position.copy(point);
-      cursor.updateMatrix();
-      packets.setMatrixAt(i, cursor.matrix);
+    // Paused and hidden-flow frames still update the live clock, without uploading
+    // the identical instance buffer or walking every cable spline again.
+    if (flow && packetTime !== elapsed) {
+      for (let i = 0; i < movingPackets.length; i++) {
+        const packet = movingPackets[i];
+        packet.curve.getPointAt((elapsed * 0.065 + packet.phase) % 1, point);
+        cursor.position.copy(point);
+        cursor.updateMatrix();
+        packets.setMatrixAt(i, cursor.matrix);
+      }
+      packets.instanceMatrix.needsUpdate = true;
+      packetTime = elapsed;
     }
-    packets.instanceMatrix.needsUpdate = true;
     for (const item of flows) {
       item.mesh.visible = flow;
-      item.curve.getPointAt(
+      if (flow) item.curve.getPointAt(
         (elapsed * item.speed + item.phase) % 1,
         item.mesh.position,
       );

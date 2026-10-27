@@ -15,6 +15,7 @@ type Props = Pick<
   active: boolean;
   showClock: boolean;
   showLabels: boolean;
+  compact: boolean;
   highlight: string | null;
   onHover: (id: string | null) => void;
   onCoffee: () => void;
@@ -163,14 +164,16 @@ export function DeskModel(props: Props) {
     <group
       ref={root}
       onClick={click}
-      onPointerMove={(event) => {
+      // Touch navigation uses clicks and the story dock. Without hover handlers R3F
+      // skips pointer-move raycasts across the entire desk while a phone is orbiting.
+      onPointerMove={props.compact ? undefined : (event) => {
         const id = identity(event.object);
         if (id) {
           event.stopPropagation();
           props.onHover(id);
         }
       }}
-      onPointerOut={() => props.onHover(null)}
+      onPointerOut={props.compact ? undefined : () => props.onHover(null)}
     />
   );
 }

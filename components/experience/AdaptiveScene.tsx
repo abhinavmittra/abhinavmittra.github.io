@@ -60,6 +60,10 @@ export default function AdaptiveScene(props: SceneProps) {
   const config = qualitySettings[props.quality];
   const activeStation = highlight ?? props.focusedStation;
   useEffect(() => {
+    // A desktop hover must not remain latched after switching to the touch layout.
+    if (props.compact) setHighlight(null);
+  }, [props.compact]);
+  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => setVisible(entries[0].isIntersecting),
       { threshold: 0.05 },
@@ -162,6 +166,7 @@ export default function AdaptiveScene(props: SceneProps) {
             }}
           />
           <DeskModel
+            compact={props.compact}
             motion={running}
             active={visible && pageVisible}
             showClock={!portal && !props.focusedStation}

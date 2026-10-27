@@ -29,7 +29,7 @@ Open http://127.0.0.1:4173. `npm run check` runs the project checks. `npm run bu
 - `content/` — canonical portfolio, product, appearance, travel and roadmap data.
 - `reference/geography/` — Natural Earth source data and provenance for the generated map.
 - `public/` — artwork, icons, flags, résumé and generated map data.
-- `docs/` — architecture, performance, deployment and source notes. Maintained documents follow OKF v0.2.
+- `docs/` — contributor and project documentation. Maintained documents follow OKF v0.2.
 
 Edit content in `content/` and preserve one canonical record per project. The work proposals are not claims of shipped features. Fictional workflows are labelled in the project stories.
 
@@ -42,5 +42,7 @@ In the repository, open **Settings → Pages** and set the build and deployment 
 ## Contributing
 
 See [Contributing](CONTRIBUTING.md) and the [documentation index](docs/index.md).
+
+Start documentation discovery at the [documentation index](docs/index.md); maintained knowledge under `docs/` follows Google Cloud's Open Knowledge Format v0.2.
 
 The project code is MIT licensed. The A•WAKE artwork, personal résumé and third-party assets have separate terms described in [NOTICE](NOTICE.md).

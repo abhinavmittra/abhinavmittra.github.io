@@ -105,7 +105,8 @@ export function createBrewScene(host,{onRenderer}={}) {
   const endInteraction=()=>{interacting=false;scheduler?.request();};
   const wake=()=>scheduler?.request();
   controls.addEventListener('change',wake);controls.addEventListener('start',startInteraction);controls.addEventListener('end',endInteraction);
-  const resize=()=>{const w=host.clientWidth,h=host.clientHeight;camera.aspect=w/Math.max(h,1);camera.updateProjectionMatrix();renderer.setSize(w,h);scheduler?.request();};
+  let viewWidth=0,viewHeight=0;
+  const resize=()=>{viewWidth=host.clientWidth;viewHeight=host.clientHeight;camera.aspect=viewWidth/Math.max(viewHeight,1);camera.updateProjectionMatrix();renderer.setSize(viewWidth,viewHeight);scheduler?.request();};
   const observer=new ResizeObserver(resize);observer.observe(host);resize();
   let lastAzimuth=controls.getAzimuthalAngle(),lastPolar=controls.getPolarAngle();
   function applyInertia(dt=1/60) {
@@ -145,6 +146,7 @@ export function createBrewScene(host,{onRenderer}={}) {
     camera.position.set(4.2,3.25,6.5);controls.target.set(0,1.35,0);model.group.rotation.y=.55;controls.update();controls.enableDamping=!gentle;
     lastAzimuth=controls.getAzimuthalAngle();lastPolar=controls.getPolarAngle();motion.reset();honeyX=honeyZ=0;for(const item of loose)item.x=item.z=0;applyInertia();
   }
+  const ingredients=Object.values(ingredientGroups);
   function draw(now){
     if(disposed)return;
     const dt=Math.min((now-last)/1000,.1);last=now;
@@ -157,8 +159,8 @@ export function createBrewScene(host,{onRenderer}={}) {
     lastAzimuth=azimuth;lastPolar=polar;motion.update(dt,gentle);phase+=gentle?0:dt*9;applyInertia(dt);
     if(gentle)brown.color.copy(targetRoast);else brown.color.lerp(targetRoast,1-Math.exp(-9*dt));
     ingredientAge+=dt;
-    for(const group of Object.values(ingredientGroups))group.position.y=gentle?0:Math.max(0,1-ingredientAge*2)*.28;
-    model.updatePrint(camera,host.clientWidth,host.clientHeight);renderer.render(scene,camera);
+    for(const group of ingredients)group.position.y=gentle?0:Math.max(0,1-ingredientAge*2)*.28;
+    model.updatePrint(camera,viewWidth,viewHeight);renderer.render(scene,camera);
     sampleTime+=dt;sampleFrames++;
     if(sampleTime>2){host.dataset.drawCalls=String(renderer.info?.render.calls||0);if(!software&&sampleFrames/sampleTime<45){renderer.setPixelRatio(1);renderer.shadowMap.enabled=false;scene.traverse(object=>{if(object.material?.transmission>0){object.material.transmission=0;object.material.needsUpdate=true;}});}sampleTime=sampleFrames=0;}
     const energy=Math.abs(motion.state.x)+Math.abs(motion.state.z)+Math.abs(motion.state.vx)+Math.abs(motion.state.vz);

@@ -1,16 +1,29 @@
 import * as THREE from "three";
-import { dampValue } from "./workspaceMotion";
+import { dampValue } from "./workspaceMotion.js";
 
 const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
 const overlap = (a, b) =>
   Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x)) *
   Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
+const rect = () => ({x:0,y:0,w:0,h:0});
+function score(p, index, entry, obstacles, models, placed) {
+  let cost = 0;
+  for (const b of obstacles) cost += overlap(p,b)*40;
+  for (const b of models) cost += overlap(p,b)*3;
+  for (const b of placed) cost += overlap(p,b)*30;
+  const m=entry.model;
+  return cost + Math.hypot(p.x+entry.w/2-m.x-m.w/2,p.y+entry.h/2-m.y-m.h/2)*2
+    + index*3 - (index===entry.choice?40:0);
+}
 
 /** Translucent HTML annotations beside their objects; all sizes are observer-cached. */
 export function createStationLabels(host, stations, buttons) {
   let width = host.clientWidth,
     height = host.clientHeight;
   const compact = matchMedia('(max-width: 800px)');
+  let dirty=true,settling=true,lastSeparation=-1,lastSelected=null,lastHovered=null,lastSnap=false,layouts=0;
+  const view=new THREE.Matrix4(),projection=new THREE.Matrix4();
+  const models=[],placed=[],previousObstacles=[];
   const vector = new THREE.Vector3(),
     ns = "http://www.w3.org/2000/svg";
   const wires = document.createElementNS(ns, "svg");
@@ -39,6 +52,13 @@ export function createStationLabels(host, stations, buttons) {
       ready: false,
       choice: 0,
       visible: true,
+      model: rect(),
+      rect: rect(),
+      matrix: new THREE.Matrix4(),
+      candidates: Array.from({length:8},rect),
+      engaged: false,
+      transform: '',
+      path: '',
     };
   });
   const blockers = [stations.lamp, stations.clock]
@@ -50,10 +70,14 @@ export function createStationLabels(host, stations, buttons) {
         bounds: new THREE.Box3()
           .setFromObject(station)
           .applyMatrix4(station.matrixWorld.clone().invert()),
+        matrix: new THREE.Matrix4(),
+        model: rect(),
       };
     });
   const modelEntries = [...entries, ...blockers];
+  for(const entry of modelEntries) models.push(entry.model);
   const observer = new ResizeObserver((records) => {
+    dirty=true;
     width = host.clientWidth;
     height = host.clientHeight;
     for (const record of records) {
@@ -91,12 +115,34 @@ export function createStationLabels(host, stations, buttons) {
         entry.button.hidden = true;
         entry.wire.style.display = 'none';
       }
+      dirty=true;
       return;
     }
-    const models = [];
+    // Camera and station transforms are stable once arrival/orbit settles. Keep
+    // projection, collision scoring and DOM writes out of those idle frames.
+    let project=dirty || !view.equals(camera.matrixWorldInverse) || !projection.equals(camera.projectionMatrix) || lastSeparation!==separation;
+    for(const entry of modelEntries){
+      entry.station.updateWorldMatrix(true,false);
+      if(!entry.matrix.equals(entry.station.matrixWorld)) project=true;
+    }
+    if(previousObstacles.length!==obstacles.length) dirty=true;
+    for(let i=0;i<obstacles.length;i++){
+      const next=obstacles[i],old=previousObstacles[i] ||= rect();
+      if(old.x!==next.x||old.y!==next.y||old.w!==next.w||old.h!==next.h) dirty=true;
+      Object.assign(old,next);
+    }
+    previousObstacles.length=obstacles.length;
+    for(const entry of entries){
+      const engaged=hovered===entry.button.dataset.station||entry.button.matches(':hover, :focus-visible');
+      if(entry.engaged!==engaged) dirty=true;
+      entry.engaged=engaged;
+    }
+    if(!project&&!dirty&&!settling&&selected===lastSelected&&hovered===lastHovered&&snap===lastSnap) return;
+    if(project){
+    view.copy(camera.matrixWorldInverse);projection.copy(camera.projectionMatrix);lastSeparation=separation;
     for (const entry of modelEntries) {
       const { station, bounds } = entry;
-      station.updateWorldMatrix(true, false);
+      entry.matrix.copy(station.matrixWorld);
       let left = Infinity,
         top = Infinity,
         right = -Infinity,
@@ -117,10 +163,12 @@ export function createStationLabels(host, stations, buttons) {
         top = Math.min(top, y);
         bottom = Math.max(bottom, y);
       }
-      entry.model = { x: left, y: top, w: right - left, h: bottom - top };
-      models.push(entry.model);
+      Object.assign(entry.model,{x:left,y:top,w:right-left,h:bottom-top});
     }
-    const placed = [];
+    }
+    dirty=false;settling=false;lastSelected=selected;lastHovered=hovered;lastSnap=snap;
+    host.dataset.labelLayouts=String(++layouts);
+    placed.length=0;
     for (const entry of entries) {
       const { button, model: m, w, h } = entry;
       entry.visible =
@@ -132,36 +180,21 @@ export function createStationLabels(host, stations, buttons) {
       button.hidden = !entry.visible;
       entry.wire.style.display = entry.visible ? "" : "none";
       if (!entry.visible) continue;
-      const candidates = [
-        { x: m.x + (m.w - w) / 2, y: m.y - h + 4 },
-        { x: m.x + (m.w - w) / 2, y: m.y + m.h - 4 },
-        { x: m.x - w + 8, y: m.y + m.h * 0.4 - h / 2 },
-        { x: m.x + m.w - 8, y: m.y + m.h * 0.4 - h / 2 },
-        { x: m.x - w * 0.4, y: m.y - h + 4 },
-        { x: m.x + m.w - w * 0.6, y: m.y - h + 4 },
-        { x: m.x - w * 0.4, y: m.y + m.h - 4 },
-        { x: m.x + m.w - w * 0.6, y: m.y + m.h - 4 },
-      ].map((p) => ({
-        x: clamp(p.x, 4, Math.max(4, width - w - 4)),
-        y: clamp(p.y, 4, Math.max(4, height - h - 4)),
-        w,
-        h,
-      }));
-      const score = (p, index) =>
-        obstacles.reduce((sum, b) => sum + overlap(p, b), 0) * 40 +
-        models.reduce((sum, b) => sum + overlap(p, b), 0) * 3 +
-        placed.reduce((sum, b) => sum + overlap(p, b), 0) * 30 +
-        Math.hypot(p.x + w / 2 - m.x - m.w / 2, p.y + h / 2 - m.y - m.h / 2) *
-          2 +
-        index * 3 -
-        (index === entry.choice ? 40 : 0);
-      const engaged =
-        hovered === button.dataset.station ||
-        button.matches(":hover, :focus-visible");
+      const candidates=entry.candidates;
+      for(let i=0;i<8;i++){
+        const p=candidates[i];
+        p.x=i<2?m.x+(m.w-w)/2:i===2?m.x-w+8:i===3?m.x+m.w-8:i%2===0?m.x-w*.4:m.x+m.w-w*.6;
+        p.y=i===0||i===4||i===5?m.y-h+4:i===1||i>=6?m.y+m.h-4:m.y+m.h*.4-h/2;
+        p.x=clamp(p.x,4,Math.max(4,width-w-4));p.y=clamp(p.y,4,Math.max(4,height-h-4));p.w=w;p.h=h;
+      }
       let best = entry.choice;
-      if (!engaged || !entry.ready)
-        for (let i = 0; i < candidates.length; i++)
-          if (score(candidates[i], i) < score(candidates[best], best)) best = i;
+      if (!entry.engaged || !entry.ready){
+        let bestScore=score(candidates[best],best,entry,obstacles,models,placed);
+        for(let i=0;i<candidates.length;i++){
+          const cost=score(candidates[i],i,entry,obstacles,models,placed);
+          if(cost<bestScore){best=i;bestScore=cost;}
+        }
+      }
       entry.choice = best;
       const target = candidates[best];
       entry.x =
@@ -172,10 +205,12 @@ export function createStationLabels(host, stations, buttons) {
         snap || !entry.ready
           ? target.y
           : dampValue(entry.y, target.y, 14, delta);
-      entry.rect = { x: entry.x, y: entry.y, w, h };
+      if(entry.x!==target.x||entry.y!==target.y) settling=true;
+      Object.assign(entry.rect,{x:entry.x,y:entry.y,w,h});
       placed.push(entry.rect);
       entry.ready = true;
-      button.style.transform = `translate3d(${entry.x}px,${entry.y}px,0)`;
+      const transform=`translate3d(${entry.x}px,${entry.y}px,0)`;
+      if(entry.transform!==transform){button.style.transform=transform;entry.transform=transform;}
       const active = hovered === button.dataset.station;
       button.classList.toggle("is-hovered", active);
       button.dataset.ready = "true";
@@ -193,7 +228,8 @@ export function createStationLabels(host, stations, buttons) {
         ty = my + dy * k;
       const sx = clamp(tx, entry.x + 4, entry.x + w - 4),
         sy = clamp(ty, entry.y + 4, entry.y + h - 4);
-      entry.wire.setAttribute("d", `M${sx},${sy} L${tx},${ty}`);
+      const path=`M${sx},${sy} L${tx},${ty}`;
+      if(entry.path!==path){entry.wire.setAttribute('d',path);entry.path=path;}
       entry.wire.classList.toggle("active", active);
     }
   }

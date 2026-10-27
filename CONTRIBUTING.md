@@ -8,7 +8,7 @@ Edit canonical records in `content/`. Ground employment claims in supplied facts
 
 ## Knowledge format
 
-Maintained documents under `docs/` follow [Open Knowledge Format v0.2](https://github.com/GoogleCloudPlatform/open-knowledge-format/blob/main/SPEC.md). YAML frontmatter belongs at the **start** of the file. `type` is required; this project also uses `title`, `description`, `tags`, `status` and `updated`. Cite primary sources beside technical claims.
+Maintained documents under `docs/` follow [Google Cloud's Open Knowledge Format v0.2](https://github.com/GoogleCloudPlatform/open-knowledge-format/blob/main/SPEC.md). Start discovery at [docs/index.md](docs/index.md), then open only the relevant topic or subdirectory index. Concept documents have YAML frontmatter at the **start** of the file. `type` is required; this project also uses `title`, `description`, `tags`, `status` and `updated`. These additional fields are project conventions, not OKF's minimum conformance rules. Cite primary sources beside technical claims; research documents use `sources` entries with stable IDs and matching footnotes.
 
 ```yaml
 ---
@@ -22,6 +22,6 @@ updated: 2026-10-27
 ---
 ```
 
-Maintain [docs/index.md](docs/index.md). Remove obsolete reviews or label them historical. The repository check verifies frontmatter placement, project fields and local Markdown links; it is not a full OKF schema validator.
+Reserved `index.md` files list their directory's concepts and subdirectories, with short descriptions. They do **not** carry concept metadata: only the bundle-root `docs/index.md` declares `okf_version: "0.2"`. Keep an index in each knowledge subdirectory. Reserve `log.md` for newest-first ISO date headings if a log is needed. Remove obsolete reviews or label them historical. The repository check verifies these index rules, index coverage, concept metadata and local Markdown links; it is not a full YAML/schema validator.
 
-Do not commit local agent/editor files, environment files, credentials, exports or browser screenshots. CI builds without deployment credentials. Dependabot opens update PRs; review release notes and visual behavior before merging, especially graphics/Next.js majors.
+Keep personal brainstorms, draft research and editor-specific notes under the ignored `.vscode/` directory. Move only finalized, contributor-relevant guidance into `docs/` and add it to the appropriate OKF index. Do not commit local agent/editor files, environment files, credentials, exports or browser screenshots. CI builds without deployment credentials. Dependabot opens update PRs; review release notes and visual behavior before merging, especially graphics/Next.js majors.

@@ -10,7 +10,7 @@ updated: 2026-10-27
 
 # Travel atlas
 
-The user supplied the 29-country list. `scripts/prepare-travel-data.mjs` derives boundaries and focus coordinates from Natural Earth v5.1.2. Source GeoJSON and checksum live in `reference/geography/`; runtime data is in `public/travel/`.
+The atlas includes the portfolio owner's 29-country list. `scripts/prepare-travel-data.mjs` derives boundaries and focus coordinates from Natural Earth v5.1.2. Source GeoJSON and checksum live in `reference/geography/`; runtime data is in `public/travel/`.
 
 The source uses `ADM0_A3`, `ISO_A2_EH`, `LABEL_X`, `LABEL_Y` and `SUBREGION`. Label points focus the camera; they are not claimed trip locations. Rings are normalized for D3’s spherical winding, including dateline islands. The map uses de facto boundaries and includes territories, which are not the counting denominator.
 
