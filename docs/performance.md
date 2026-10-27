@@ -23,6 +23,8 @@ R3F manages pixel ratio. Slow frames reduce shadows and then DPR while retaining
 
 ## Verification
 
+R3F 9.8.2 creates a deprecated `THREE.Clock` internally. `scripts/patch-r3f-timer.mjs` runs after install and replaces that constructor in its ESM/CJS bundles with the tested `lib/frameTimer.mjs` adapter backed by `THREE.Timer`. It preserves R3F's seconds-based delta, writable elapsed time and start/stop API without filtering console warnings or adding DOM listeners. The patch is version guarded: review it when upgrading R3F, and remove it when the renderer no longer requires Clock. See [upstream issue](https://github.com/pmndrs/react-three-fiber/issues/3741) and [Timer API](https://threejs.org/docs/pages/Timer.html).
+
 `npm run check` covers TypeScript, scene motion, clock math, map sources and colours, documentation links and asset size. `npm run build` creates the static export. Desktop Chromium checks cover the tour, project opening, appearance controls, model picking, reduced motion, coffee transition and minimal-view teardown. Physical phones, Safari, screen readers and long-session GPU/thermal behaviour remain unverified.
 
 Sources: [R3F performance](https://r3f.docs.pmnd.rs/advanced/scaling-performance), [Drei PerformanceMonitor](https://drei.docs.pmnd.rs/performances/performance-monitor), [Three.js OrbitControls](https://threejs.org/docs/#examples/en/controls/OrbitControls).
