@@ -5,11 +5,11 @@
   "dependencies": {
     "@react-three/drei": "^10.7.9",
     "@react-three/fiber": "^9.8.2",
-    "d3-geo": "^3.1.1",
-    "next": "^16.4.3",
+    "d3-geo": "^3.1.2",
+    "next": "^16.4.5",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "three": "0.186.1"
+    "three": "0.187.0"
   },
   "version": "0.1.0",
   "engines": {
@@ -24,11 +24,11 @@
     "audit:assets": "node scripts/audit-assets.mjs"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.3.3",
-    "@types/node": "^26.6.5",
+    "@tailwindcss/postcss": "^4.3.4",
+    "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "@types/three": "^0.186.0",
+    "@types/three": "^0.187.0",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2"
   },
